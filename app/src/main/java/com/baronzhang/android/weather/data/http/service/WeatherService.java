@@ -2,10 +2,11 @@ package com.baronzhang.android.weather.data.http.service;
 
 import com.baronzhang.android.weather.data.http.entity.know.KnowWeather;
 import com.baronzhang.android.weather.data.http.entity.mi.MiWeather;
+
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-import rx.Observable;
 
 /**
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com)

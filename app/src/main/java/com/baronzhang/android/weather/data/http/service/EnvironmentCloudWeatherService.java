@@ -4,9 +4,9 @@ import com.baronzhang.android.weather.data.http.entity.envicloud.EnvironmentClou
 import com.baronzhang.android.weather.data.http.entity.envicloud.EnvironmentCloudForecast;
 import com.baronzhang.android.weather.data.http.entity.envicloud.EnvironmentCloudWeatherLive;
 
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import rx.Observable;
 
 /**
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com)

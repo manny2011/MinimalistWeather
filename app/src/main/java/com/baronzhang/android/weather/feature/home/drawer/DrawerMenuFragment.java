@@ -1,52 +1,33 @@
 package com.baronzhang.android.weather.feature.home.drawer;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
 
+import com.baronzhang.android.weather.BR;
 import com.baronzhang.android.weather.base.BaseFragment;
-import com.baronzhang.android.weather.R;
+import com.baronzhang.android.weather.databinding.FragmentDrawerMenuBinding;
 import com.baronzhang.android.weather.feature.selectcity.SelectCityActivity;
-import com.baronzhang.android.weather.data.db.entities.minimalist.Weather;
 
 import java.io.InvalidClassException;
-import java.util.ArrayList;
-import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
-
-public class DrawerMenuFragment extends BaseFragment implements DrawerContract.View {
-
+public class DrawerMenuFragment extends BaseFragment implements IOnDeleteCity {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
 
-
-    @BindView(R.id.add_city_btn)
-    Button addCityButton;
-    @BindView(R.id.rv_city_manager)
-    RecyclerView cityManagerRecyclerView;
-
-    private Unbinder unbinder;
-
     private int columnCount = 3;
-    private List<Weather> weatherList;
     private CityManagerAdapter cityManagerAdapter;
 
-    private DrawerContract.Presenter presenter;
-
-    private OnSelectCity onSelectCity;
+    private FragmentDrawerMenuBinding binding;
+    private DrawerMenuViewModel viewModel;
 
     public DrawerMenuFragment() {
     }
@@ -59,16 +40,15 @@ public class DrawerMenuFragment extends BaseFragment implements DrawerContract.V
         return fragment;
     }
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnSelectCity) {
-            onSelectCity = (OnSelectCity) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
+//        if (context instanceof OnSelectCity) {
+//            onSelectCity = (OnSelectCity) context;
+//        } else {
+//            throw new RuntimeException(context.toString()
+//                    + " must implement OnFragmentInteractionListener");
+//        }
     }
 
     @Override
@@ -83,71 +63,78 @@ public class DrawerMenuFragment extends BaseFragment implements DrawerContract.V
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_drawer_menu, container, false);
-        unbinder = ButterKnife.bind(this, rootView);
-        Context context = rootView.getContext();
-        if (columnCount <= 1) {
-            cityManagerRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        } else {
-            cityManagerRecyclerView.setLayoutManager(new GridLayoutManager(context, columnCount));
-        }
-        cityManagerRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        weatherList = new ArrayList<>();
-        cityManagerAdapter = new CityManagerAdapter(weatherList);
-        cityManagerAdapter.setOnItemClickListener(new CityManagerAdapter.OnCityManagerItemClickListener() {
+        binding = FragmentDrawerMenuBinding.inflate(LayoutInflater.from(getContext()));
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                try {
-                    presenter.saveCurrentCityToPreference(weatherList.get(position).getCityId());
-                    onSelectCity.onSelect(weatherList.get(position).getCityId());
-                } catch (InvalidClassException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onDeleteClick(String cityId) {
-                presenter.deleteCity(cityId);
-            }
+        binding.head.addCityBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), SelectCityActivity.class);
+            startActivity(intent);
         });
-        cityManagerRecyclerView.setAdapter(cityManagerAdapter);
 
-        presenter.subscribe();
+        if (columnCount <= 1) {
+            binding.rvCityManager.setLayoutManager(new LinearLayoutManager(getContext()));
+        } else {
+            binding.rvCityManager.setLayoutManager(new GridLayoutManager(getContext(), columnCount));
+        }
+        binding.rvCityManager.setItemAnimator(new DefaultItemAnimator());
+        cityManagerAdapter = new CityManagerAdapter(viewModel, this);
+//        cityManagerAdapter.setOnItemClickListener(new CityManagerAdapter.OnCityManagerItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                try {
+//                    presenter.saveCurrentCityToPreference(weatherList.get(position).getCityId());
+//                    onSelectCity.onSelect(weatherList.get(position).getCityId());
+//                } catch (InvalidClassException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onDeleteClick(String cityId) {
+//                presenter.deleteCity(cityId);
+//            }
+//        });
+        binding.rvCityManager.setAdapter(cityManagerAdapter);
+        binding.setVariable(BR.viewModel, viewModel);
+        viewModel.weathers.observe(this, it -> {
+            if (it != null)
+                cityManagerAdapter.notifyDataSetChanged();
+        });
+        viewModel.loadSavedCities();
+        return binding.getRoot();
+    }
 
-        return rootView;
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        viewModel.weathers.observe(this, it -> {
+            cityManagerAdapter.notifyDataSetChanged();
+        });
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
-        presenter.unSubscribe();
+    }
+
+
+    @Override
+    public void onDelete(String cityId) {
+        viewModel.deleteCity(cityId);
     }
 
     @Override
-    public void displaySavedCities(List<Weather> weatherList) {
-        this.weatherList.clear();
-        this.weatherList.addAll(weatherList);
-        cityManagerAdapter.notifyDataSetChanged();
+    public void onSelect(String cityId) {
+        try {
+            viewModel.saveCurrentCityToPreference(cityId);//event to viewModel
+            viewModel.currentCity.setValue(cityId);
+        } catch (InvalidClassException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public void setPresenter(DrawerMenuPresenter presenter) {
-
-        this.presenter = presenter;
-    }
-
-
-    @OnClick(R.id.add_city_btn)
-    void onAddCityClick() {
-        Intent intent = new Intent(getActivity(), SelectCityActivity.class);
-        startActivity(intent);
-    }
-
-
-    public interface OnSelectCity {
-
-        void onSelect(String cityId);
+    public void setViewModel(DrawerMenuViewModel drawerMenuViewModel) {
+        this.viewModel = drawerMenuViewModel;
     }
 }

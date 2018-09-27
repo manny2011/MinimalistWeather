@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.baronzhang.android.weather.base.BaseRecyclerViewAdapter;
 import com.baronzhang.android.weather.R;
 import com.baronzhang.android.weather.data.db.entities.minimalist.LifeIndex;
+import com.baronzhang.android.weather.databinding.ItemLifeIndexBinding;
 
 import java.util.List;
 
@@ -27,46 +28,39 @@ import static com.baronzhang.android.weather.R.drawable.ic_index_sunscreen;
 public class LifeIndexAdapter extends BaseRecyclerViewAdapter<LifeIndexAdapter.ViewHolder> {
 
     private Context context;
-    private List<LifeIndex> indexList;
+    private HomePageViewModel homePageViewModel;
 
-    public LifeIndexAdapter(Context context, List<LifeIndex> indexList) {
+    public LifeIndexAdapter(Context context, HomePageViewModel homePageViewModel) {
         this.context = context;
-        this.indexList = indexList;
+        this.homePageViewModel=homePageViewModel;
     }
 
     @Override
     public LifeIndexAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_life_index, parent, false);
-        return new ViewHolder(itemView, this);
+        ItemLifeIndexBinding binding = ItemLifeIndexBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(LifeIndexAdapter.ViewHolder holder, int position) {
-        LifeIndex index = indexList.get(position);
-        holder.indexIconImageView.setImageDrawable(getIndexDrawable(context, index.getName()));
-        holder.indexLevelTextView.setText(index.getIndex());
-        holder.indexNameTextView.setText(index.getName());
+        LifeIndex lifeIndex = homePageViewModel.lifeIndices.getValue().get(position);
+        holder.bindData(lifeIndex);
+        holder.lifeIndexBinding.indexIconImageView.setImageDrawable(getIndexDrawable(context, lifeIndex.getName()));
     }
 
     @Override
     public int getItemCount() {
-        return indexList == null ? 0 : indexList.size();
+        return homePageViewModel.lifeIndices.getValue().size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.index_icon_image_view)
-        ImageView indexIconImageView;
-        @BindView(R.id.index_level_text_view)
-        TextView indexLevelTextView;
-        @BindView(R.id.index_name_text_view)
-        TextView indexNameTextView;
-
-        ViewHolder(View itemView, LifeIndexAdapter adapter) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(v -> adapter.onItemHolderClick(LifeIndexAdapter.ViewHolder.this));
+        ItemLifeIndexBinding lifeIndexBinding;
+        public ViewHolder(ItemLifeIndexBinding binding) {
+            super(binding.getRoot());
+            this.lifeIndexBinding=binding;
+        }
+        public void bindData(LifeIndex lifeIndex){
+            lifeIndexBinding.setLifeIndex(lifeIndex);
         }
     }
 

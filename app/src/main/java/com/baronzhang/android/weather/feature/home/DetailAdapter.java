@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.baronzhang.android.weather.base.BaseRecyclerViewAdapter;
 import com.baronzhang.android.weather.R;
 import com.baronzhang.android.weather.data.WeatherDetail;
+import com.baronzhang.android.weather.databinding.ItemDetailBinding;
 
 import java.util.List;
 
@@ -22,45 +23,42 @@ import butterknife.ButterKnife;
  */
 public class DetailAdapter extends BaseRecyclerViewAdapter<DetailAdapter.ViewHolder> {
 
-    private List<WeatherDetail> details;
+    private HomePageViewModel homePageViewModel;
 
-    public DetailAdapter(List<WeatherDetail> details) {
-        this.details = details;
+    public DetailAdapter(HomePageViewModel homePageViewModel) {
+        this.homePageViewModel=homePageViewModel;
     }
 
     @Override
     public DetailAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_detail, parent, false);
-        return new ViewHolder(itemView, this);
+        ItemDetailBinding binding = ItemDetailBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(DetailAdapter.ViewHolder holder, int position) {
-        WeatherDetail detail = details.get(position);
-        holder.detailIconImageView.setImageResource(detail.getIconResourceId());
-        holder.detailKeyTextView.setText(detail.getKey());
-        holder.detailValueTextView.setText(detail.getValue());
+        WeatherDetail detail = homePageViewModel.weatherDetails.getValue().get(position);
+        holder.itemDetailBinding.detailIconImageView.setImageResource(detail.getIconResourceId());
+        holder.bindData(detail);
+//        android:src="@{weatherDetail.iconResourceId}"
+
     }
 
     @Override
     public int getItemCount() {
-        return details == null ? 0 : details.size();
+        return homePageViewModel.weatherDetails.getValue().size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+        private ItemDetailBinding itemDetailBinding;
+        ViewHolder(ItemDetailBinding itemDetailBinding) {
+            super(itemDetailBinding.getRoot());
+            this.itemDetailBinding=itemDetailBinding;
+        }
 
-        @BindView(R.id.detail_icon_image_view)
-        ImageView detailIconImageView;
-        @BindView(R.id.detail_key_text_view)
-        TextView detailKeyTextView;
-        @BindView(R.id.detail_value_text_view)
-        TextView detailValueTextView;
-
-        ViewHolder(View itemView, DetailAdapter adapter) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(v -> adapter.onItemHolderClick(DetailAdapter.ViewHolder.this));
+        public void bindData(WeatherDetail weatherDetail){
+            itemDetailBinding.setWeatherDetail(weatherDetail);
+            itemDetailBinding.executePendingBindings();
         }
     }
 }

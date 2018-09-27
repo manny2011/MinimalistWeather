@@ -1,84 +1,102 @@
 package com.baronzhang.android.weather.feature.selectcity;
 
+import android.databinding.DataBindingUtil;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.TextView;
 
 import com.annimon.stream.Stream;
 import com.baronzhang.android.weather.base.BaseRecyclerViewAdapter;
 import com.baronzhang.android.weather.R;
 import com.baronzhang.android.weather.data.db.entities.City;
+import com.baronzhang.android.weather.databinding.ItemCityBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 /**
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com)
- *         16/3/16
+ * 16/3/16
  */
-public class CityListAdapter extends BaseRecyclerViewAdapter<CityListAdapter.ViewHolder> implements Filterable {
+public class CityListAdapter extends BaseRecyclerViewAdapter<CityListAdapter.ViewHolder> implements Filterable{
 
-    private List<City> cities;
-    public List<City> mFilterData;//过滤后的数据
+    private final SelectCityViewModel viewModel;
 
-    private RecyclerViewFilter filter;
+    private IOnSelectCity onSelectCity;
 
-    public CityListAdapter(List<City> cities) {
-        this.cities = cities;
-        mFilterData = cities;
+    private Filter mFilter;
+
+    private List<City> mFilteredData;
+
+    public void updateFilterdData(List<City> latest){
+        this.mFilteredData=latest;
+        notifyDataSetChanged();
+    }
+
+    public CityListAdapter(SelectCityViewModel viewModel,IOnSelectCity onSelectCity) {
+        this.viewModel = viewModel;
+        this.onSelectCity=onSelectCity;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ItemCityBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
+                R.layout.item_city, parent, false);
+        return new ViewHolder(binding, viewModel,onSelectCity);
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_city, parent, false);
-        return new ViewHolder(itemView, this);
-    }
-
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        City city = mFilterData.get(position);
-        String cityName = city.getCityName();
-        String parentName = city.getParent();
-        if (!cityName.equals(parentName)) {
-            cityName = parentName + "." + cityName;
-        }
-        holder.cityNameTextView.setText(cityName);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        City city = mFilteredData.get(position);
+        holder.bind(city);
     }
 
     @Override
     public int getItemCount() {
-        return mFilterData == null ? 0 : mFilterData.size();
-    }
-
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.city_name_text_view)
-        TextView cityNameTextView;
-
-        ViewHolder(View itemView, CityListAdapter cityListAdapter) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(v -> cityListAdapter.onItemHolderClick(this));
-        }
+        return mFilteredData.size();
     }
 
     @Override
     public Filter getFilter() {
-        if (filter == null) {
-            filter = new RecyclerViewFilter();
+        if(mFilter==null)
+            mFilter=new RecyclerViewFilter(viewModel);
+        return mFilter;
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private ItemCityBinding binding;
+        private SelectCityViewModel viewModel;
+        private IOnSelectCity onSelectCity;
+
+        ViewHolder(ItemCityBinding binding, SelectCityViewModel viewModel, IOnSelectCity onSelectCity) {
+            super(binding.getRoot());
+            this.binding = binding;
+            this.viewModel = viewModel;
+            this.onSelectCity=onSelectCity;
         }
-        return filter;
+
+        public void bind(City city) {
+            binding.setCity(city);
+            binding.getRoot().setOnClickListener(v-> {
+                if(onSelectCity!=null)
+                    onSelectCity.onSelectCity(String.valueOf(city.getCityId()));
+            });
+            binding.executePendingBindings();
+        }
+
     }
 
     private class RecyclerViewFilter extends Filter {
+        private SelectCityViewModel viewModel;
+
+        public RecyclerViewFilter(SelectCityViewModel viewModel) {
+            this.viewModel = viewModel;
+        }
 
         @Override
         protected FilterResults performFiltering(CharSequence charSequence) {
@@ -94,7 +112,7 @@ public class CityListAdapter extends BaseRecyclerViewAdapter<CityListAdapter.Vie
                 String prefixString = charSequence.toString().toLowerCase();
                 //新建Values存放过滤后的数据
                 ArrayList<City> newValues = new ArrayList<>();
-                Stream.of(cities)
+                Stream.of(viewModel.items.getValue())
                         .filter(city -> (city.getCityName().contains(prefixString)
                                 || city.getCityNameEn().contains(prefixString) || city.getParent().contains(prefixString)
                                 || city.getRoot().contains(prefixString)))
@@ -107,11 +125,11 @@ public class CityListAdapter extends BaseRecyclerViewAdapter<CityListAdapter.Vie
 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            mFilterData = (List<City>) filterResults.values;
+            mFilteredData = (List<City>) filterResults.values;
             if (filterResults.count > 0) {
                 notifyDataSetChanged();//重绘当前可见区域
             } else {
-                mFilterData = cities;
+                mFilteredData = viewModel.items.getValue();
                 notifyDataSetChanged();//会重绘控件（还原到初始状态）
             }
         }

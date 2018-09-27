@@ -20,7 +20,7 @@ public class WeatherApplication extends Application {
 
     private static final String TAG = "WeatherApp";
 
-    private ApplicationComponent applicationComponent;
+//    private ApplicationComponent applicationComponent;
 
     private static WeatherApplication weatherApplicationInstance;
 
@@ -44,9 +44,9 @@ public class WeatherApplication extends Application {
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
         }
 
-        applicationComponent = DaggerApplicationComponent.builder()
-                .applicationModule(new ApplicationModule(this))
-                .build();
+//        applicationComponent = DaggerApplicationComponent.builder()
+//                .applicationModule(new ApplicationModule(this))
+//                .build();
 
         //初始化Stetho
         BuildConfig.STETHO.init(this.getApplicationContext());
@@ -64,8 +64,8 @@ public class WeatherApplication extends Application {
     }
 
 
-    public ApplicationComponent getApplicationComponent() {
-
-        return applicationComponent;
-    }
+//    public ApplicationComponent getApplicationComponent() {
+//
+//        return applicationComponent;
+//    }
 }

@@ -1,5 +1,6 @@
 package com.baronzhang.android.weather;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -31,6 +32,8 @@ public class WelcomeActivity extends BaseActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> gotoMainPage());
+
+
     }
 
     private void gotoMainPage() {

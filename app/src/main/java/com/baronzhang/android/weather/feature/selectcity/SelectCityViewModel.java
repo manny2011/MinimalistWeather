@@ -1,0 +1,95 @@
+package com.baronzhang.android.weather.feature.selectcity;
+
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
+import android.content.Context;
+import android.content.Intent;
+import android.databinding.ObservableArrayList;
+import android.databinding.ObservableList;
+import android.nfc.Tag;
+import android.support.annotation.NonNull;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.baronzhang.android.weather.WelcomeActivity;
+import com.baronzhang.android.weather.data.db.CityDatabaseHelper;
+import com.baronzhang.android.weather.data.db.dao.CityDao;
+import com.baronzhang.android.weather.data.db.entities.City;
+import com.baronzhang.android.weather.data.preference.PreferenceHelper;
+import com.baronzhang.android.weather.data.preference.WeatherSettings;
+import com.baronzhang.android.weather.feature.home.drawer.RecyclerItemMultiLister;
+import com.j256.ormlite.dao.Dao;
+
+import java.io.InvalidClassException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import rx.Observable;
+import rx.Observer;
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
+public class SelectCityViewModel extends AndroidViewModel implements RecyclerItemMultiLister {
+
+    static final String TAG="SelectCityVM";
+
+    public MutableLiveData<List<City>> items=new MutableLiveData<>();
+
+    public SelectCityViewModel(@NonNull Application application) {
+        super(application);
+        items.setValue(new ArrayList<>());
+    }
+
+    public void loadCities(Context ctx) {
+        Dao<City, Integer> cityDao = CityDatabaseHelper.getInstance(ctx).getCityDao(City.class);
+        assert cityDao != null;
+        try {
+            Observable.just(cityDao.queryForAll())
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<List<City>>() {
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+
+                        @Override
+                        public void onNext(List<City> cities) {
+                            items.setValue(cities);
+                        }
+                    });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveCurrentCityToPreference(String cityId) throws InvalidClassException {
+        PreferenceHelper.savePreference(WeatherSettings.SETTINGS_CURRENT_CITY_ID, cityId);
+        Log.d(TAG, "saveCurrentCityToPreference: 执行了点击事件 ");
+    }
+
+    @Override
+    public void add() {
+
+    }
+
+    @Override
+    public void delete(City city) {
+
+    }
+
+    @Override
+    public void navigateTo(City city) {
+    }
+
+
+}

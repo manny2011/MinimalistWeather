@@ -1,14 +1,14 @@
 package com.baronzhang.android.weather.data.db.entities.adapter;
 
 import com.baronzhang.android.library.util.DateConvertUtils;
-import com.baronzhang.android.weather.data.db.entities.minimalist.AirQualityLive;
-import com.baronzhang.android.weather.data.db.entities.minimalist.LifeIndex;
-import com.baronzhang.android.weather.data.db.entities.minimalist.WeatherForecast;
-import com.baronzhang.android.weather.data.db.entities.minimalist.WeatherLive;
 import com.baronzhang.android.weather.data.http.entity.mi.MiAQI;
 import com.baronzhang.android.weather.data.http.entity.mi.MiForecast;
 import com.baronzhang.android.weather.data.http.entity.mi.MiIndex;
 import com.baronzhang.android.weather.data.http.entity.mi.MiWeather;
+import com.baronzhang.android.weather.new_data.entity.AirQualityLive;
+import com.baronzhang.android.weather.new_data.entity.LifeIndex;
+import com.baronzhang.android.weather.new_data.entity.WeatherForecast;
+import com.baronzhang.android.weather.new_data.entity.WeatherLive;
 
 import java.util.ArrayList;
 import java.util.List;

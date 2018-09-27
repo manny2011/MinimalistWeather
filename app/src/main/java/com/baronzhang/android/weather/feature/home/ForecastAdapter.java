@@ -11,7 +11,9 @@ import android.widget.TextView;
 
 import com.baronzhang.android.weather.base.BaseRecyclerViewAdapter;
 import com.baronzhang.android.weather.R;
+import com.baronzhang.android.weather.data.WeatherDetail;
 import com.baronzhang.android.weather.data.db.entities.minimalist.WeatherForecast;
+import com.baronzhang.android.weather.databinding.ItemForecastBinding;
 
 import java.util.List;
 
@@ -24,58 +26,43 @@ import butterknife.ButterKnife;
  */
 public class ForecastAdapter extends BaseRecyclerViewAdapter<ForecastAdapter.ViewHolder> {
 
-    private List<WeatherForecast> weatherForecasts;
+    private HomePageViewModel homePageViewModel;
 
-    public ForecastAdapter(List<WeatherForecast> weatherForecasts) {
-        this.weatherForecasts = weatherForecasts;
+    public ForecastAdapter(HomePageViewModel homePageViewModel) {
+        this.homePageViewModel=homePageViewModel;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_forecast, parent, false);
-        return new ViewHolder(itemView, this);
+        ItemForecastBinding binding = ItemForecastBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new ViewHolder(binding);
     }
 
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(ForecastAdapter.ViewHolder holder, int position) {
-        WeatherForecast weatherForecast = weatherForecasts.get(position);
-        holder.weekTextView.setText(weatherForecast.getWeek());
-        holder.dateTextView.setText(weatherForecast.getDate());
-        holder.weatherIconImageView.setImageResource(R.mipmap.ic_launcher);
-        holder.weatherTextView.setText(TextUtils.isEmpty(weatherForecast.getWeather()) ?
-                (weatherForecast.getWeatherDay().equals(weatherForecast.getWeatherNight()) ?
-                        weatherForecast.getWeatherDay() : weatherForecast.getWeatherDay() + "转" + weatherForecast.getWeatherNight())
-                : weatherForecast.getWeather());
-        holder.tempMaxTextView.setText(weatherForecast.getTempMax() + "°");
-        holder.tempMinTextView.setText(weatherForecast.getTempMin() + "°");
+        WeatherForecast weatherForecast = homePageViewModel.weatherForecasts.getValue().get(position);
+        holder.bindData(weatherForecast);
     }
 
     @Override
     public int getItemCount() {
-        return weatherForecasts == null ? 0 : weatherForecasts.size();
+        return homePageViewModel.weatherForecasts.getValue().size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+        private ItemForecastBinding itemForecastBinding;
+        public ViewHolder(ItemForecastBinding binding) {
+            super(binding.getRoot());
+            this.itemForecastBinding=binding;
+        }
 
-        @BindView(R.id.week_text_view)
-        TextView weekTextView;
-        @BindView(R.id.date_text_view)
-        TextView dateTextView;
-        @BindView(R.id.weather_icon_image_view)
-        ImageView weatherIconImageView;
-        @BindView(R.id.weather_text_view)
-        TextView weatherTextView;
-        @BindView(R.id.temp_max_text_view)
-        TextView tempMaxTextView;
-        @BindView(R.id.temp_min_text_view)
-        TextView tempMinTextView;
-
-        ViewHolder(View itemView, ForecastAdapter adapter) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(v -> adapter.onItemHolderClick(ViewHolder.this));
+        public void bindData(WeatherForecast weatherForecast){
+            itemForecastBinding.setForcast(weatherForecast);
+            itemForecastBinding.weatherTextView.setText(TextUtils.isEmpty(weatherForecast.getWeather()) ?
+                    (weatherForecast.getWeatherDay().equals(weatherForecast.getWeatherNight()) ?
+                            weatherForecast.getWeatherDay() : weatherForecast.getWeatherDay() + "转" + weatherForecast.getWeatherNight())
+                    : weatherForecast.getWeather());
         }
     }
 }

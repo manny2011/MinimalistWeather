@@ -1,7 +1,6 @@
 package com.baronzhang.android.weather.feature.home.drawer;
 
 import com.baronzhang.android.weather.di.scope.ActivityScoped;
-import com.baronzhang.android.weather.feature.home.drawer.DrawerContract;
 
 import dagger.Module;
 import dagger.Provides;
@@ -13,15 +12,15 @@ import dagger.Provides;
 @Module
 public class DrawerMenuModule {
 
-    private DrawerContract.View view;
-
-    public DrawerMenuModule(DrawerContract.View view) {
-        this.view = view;
-    }
-
-    @Provides
-    @ActivityScoped
-    DrawerContract.View provideCityManagerContactView() {
-        return view;
-    }
+//    private DrawerContract.View view;
+//
+//    public DrawerMenuModule(DrawerContract.View view) {
+//        this.view = view;
+//    }
+//
+//    @Provides
+//    @ActivityScoped
+//    DrawerContract.View provideCityManagerContactView() {
+//        return view;
+//    }
 }

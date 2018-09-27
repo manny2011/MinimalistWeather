@@ -1,10 +1,10 @@
 package com.baronzhang.android.weather.data.db.entities.adapter;
 
-import com.baronzhang.android.weather.data.db.entities.minimalist.AirQualityLive;
-import com.baronzhang.android.weather.data.db.entities.minimalist.LifeIndex;
-import com.baronzhang.android.weather.data.db.entities.minimalist.Weather;
-import com.baronzhang.android.weather.data.db.entities.minimalist.WeatherForecast;
-import com.baronzhang.android.weather.data.db.entities.minimalist.WeatherLive;
+import com.baronzhang.android.weather.new_data.entity.AirQualityLive;
+import com.baronzhang.android.weather.new_data.entity.LifeIndex;
+import com.baronzhang.android.weather.new_data.entity.Weather;
+import com.baronzhang.android.weather.new_data.entity.WeatherForecast;
+import com.baronzhang.android.weather.new_data.entity.WeatherLive;
 
 import java.util.List;
 

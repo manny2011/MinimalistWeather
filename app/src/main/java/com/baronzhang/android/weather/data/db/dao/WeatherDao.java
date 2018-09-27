@@ -34,7 +34,7 @@ public class WeatherDao {
     private Dao<Weather, String> weatherDaoOperation;
 
     @Inject
-    WeatherDao(Context context) {
+    public WeatherDao(Context context) {
 
         this.context = context;
         this.apiDaoOperation = WeatherDatabaseHelper.getInstance(context).getWeatherDao(AirQualityLive.class);
@@ -58,28 +58,6 @@ public class WeatherDao {
         });
     }
 
-    public void insertOrUpdateWeather(Weather weather) throws SQLException {
-
-        TransactionManager.callInTransaction(WeatherDatabaseHelper.getInstance(context).getConnectionSource(), (Callable<Void>) () -> {
-            if (weatherDaoOperation.idExists(weather.getCityId())) {
-                updateWeather(weather);
-            } else {
-                insertWeather(weather);
-            }
-            return null;
-        });
-    }
-
-    public void deleteById(String cityId) throws SQLException {
-
-        weatherDaoOperation.deleteById(cityId);
-    }
-
-    private void delete(Weather data) throws SQLException {
-
-        weatherDaoOperation.delete(data);
-    }
-
     /**
      * 查询数据库中的所有已添加的城市
      *
@@ -100,6 +78,28 @@ public class WeatherDao {
             }
             return weatherList;
         });
+    }
+
+    public void insertOrUpdateWeather(Weather weather) throws SQLException {
+
+        TransactionManager.callInTransaction(WeatherDatabaseHelper.getInstance(context).getConnectionSource(), (Callable<Void>) () -> {
+            if (weatherDaoOperation.idExists(weather.getCityId())) {
+                updateWeather(weather);
+            } else {
+                insertWeather(weather);
+            }
+            return null;
+        });
+    }
+
+    public void deleteById(String cityId) throws SQLException {
+
+        weatherDaoOperation.deleteById(cityId);
+    }
+
+    private void delete(Weather data) throws SQLException {
+
+        weatherDaoOperation.delete(data);
     }
 
     private void insertWeather(Weather weather) throws SQLException {

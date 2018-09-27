@@ -1,12 +1,12 @@
 package com.baronzhang.android.weather.feature.home;
 
+import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -20,50 +20,27 @@ import com.baronzhang.android.weather.base.BaseActivity;
 import com.baronzhang.android.library.util.ActivityUtils;
 import com.baronzhang.android.library.util.DateConvertUtils;
 import com.baronzhang.android.weather.R;
-import com.baronzhang.android.weather.WeatherApplication;
 import com.baronzhang.android.weather.data.db.entities.minimalist.Weather;
-import com.baronzhang.android.weather.feature.home.drawer.DrawerMenuPresenter;
+import com.baronzhang.android.weather.databinding.ActivityMainBinding;
 import com.baronzhang.android.weather.feature.home.drawer.DrawerMenuFragment;
+import com.baronzhang.android.weather.feature.home.drawer.DrawerMenuViewModel;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
-
-import javax.inject.Inject;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 /**
  * 首页
  *
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com)
  */
-public class MainActivity extends BaseActivity
-        implements HomePageFragment.OnFragmentInteractionListener, DrawerMenuFragment.OnSelectCity {
+public class MainActivity extends BaseActivity {
 
-
-    @BindView(R.id.refresh_layout)
-    SmartRefreshLayout smartRefreshLayout;
-
-    @BindView(R.id.collapsing_toolbar)
-    CollapsingToolbarLayout collapsingToolbarLayout;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.drawer_layout)
-    DrawerLayout drawerLayout;
-
-    //基本天气信息
-    @BindView(R.id.temp_text_view)
-    TextView tempTextView;
-    @BindView(R.id.weather_text_view)
-    TextView weatherNameTextView;
-    @BindView(R.id.publish_time_text_view)
-    TextView realTimeTextView;
-
-    @Inject
-    HomePagePresenter homePagePresenter;
-    DrawerMenuPresenter drawerMenuPresenter;
-
-    private String currentCityId;
+    private HomePageViewModel homePageViewModel;
+    ActivityMainBinding mainBinding;
+    private DrawerMenuViewModel drawerMenuViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,50 +55,64 @@ public class MainActivity extends BaseActivity
             window.setStatusBarColor(Color.TRANSPARENT);
         }
 
-        setContentView(R.layout.activity_main);
-
-        ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
-
+        ActivityMainBinding mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+//         mainBinding = ActivityMainBinding.inflate(LayoutInflater.from(this));
+        setSupportActionBar(mainBinding.appBar.toolbar);
         //设置 Header 为 Material风格
         ClassicsHeader header = new ClassicsHeader(this);
         header.setPrimaryColors(this.getResources().getColor(R.color.colorPrimary), Color.WHITE);
-        this.smartRefreshLayout.setRefreshHeader(header);
-        this.smartRefreshLayout.setOnRefreshListener(refreshLayout -> homePagePresenter.loadWeather(currentCityId, true));
+        mainBinding.appBar.refreshLayout.setRefreshHeader(header);
 
+        mainBinding.appBar.refreshLayout.setOnRefreshListener(refreshlayout -> {
+            homePageViewModel.loadWeather(drawerMenuViewModel.currentCity.getValue(),true);
+        });
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        assert drawerLayout != null;
-        drawerLayout.addDrawerListener(toggle);
+                this, mainBinding.drawerLayout, mainBinding.appBar.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        assert mainBinding.drawerLayout != null;
+        mainBinding.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         HomePageFragment homePageFragment = (HomePageFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (homePageFragment == null) {
-
             homePageFragment = HomePageFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), homePageFragment, R.id.fragment_container);
         }
 
-        DaggerHomePageComponent.builder()
-                .applicationComponent(WeatherApplication.getInstance().getApplicationComponent())
-                .homePageModule(new HomePageModule(homePageFragment))
-                .build().inject(this);
+        homePageViewModel = new HomePageViewModel();
+        homePageViewModel=ViewModelProviders.of(this).get(HomePageViewModel.class);
+        homePageFragment.setViewModel(homePageViewModel);
+        mainBinding.appBar.refreshLayout.setOnRefreshListener(refreshLayout -> homePageViewModel.loadWeather(drawerMenuViewModel.currentCity.getValue(), true));
+
+        homePageViewModel.weather.observe(this, it -> {
+            if(mainBinding.appBar.refreshLayout.isRefreshing()){
+                mainBinding.appBar.refreshLayout.finishRefresh(true);
+            }
+            mainBinding.appBar.toolbar.setTitle(it.getCityName());
+            mainBinding.appBar.collapsingToolbar.setTitle(it.getCityName());
+            mainBinding.appBar.tempTextView.setText(it.getWeatherLive().getTemp());
+            mainBinding.appBar.publishTimeTextView.setText(getString(R.string.string_publish_time) + DateConvertUtils.timeStampToDate(it.getWeatherLive().getTime(), DateConvertUtils.DATA_FORMAT_PATTEN_YYYY_MM_DD_HH_MM));
+            drawerMenuViewModel.loadSavedCities();
+        });
+
 
         DrawerMenuFragment drawerMenuFragment = (DrawerMenuFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container_drawer_menu);
+        drawerMenuViewModel = ViewModelProviders.of(this).get(DrawerMenuViewModel.class);
         if (drawerMenuFragment == null) {
             drawerMenuFragment = DrawerMenuFragment.newInstance(1);
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), drawerMenuFragment, R.id.fragment_container_drawer_menu);
         }
-
-        drawerMenuPresenter = new DrawerMenuPresenter(this, drawerMenuFragment);
+        drawerMenuViewModel.currentCity.observe(this,it->{
+            homePageViewModel.loadWeather(it,true);
+            mainBinding.drawerLayout.closeDrawer(GravityCompat.START);
+        });
+        drawerMenuFragment.setViewModel(drawerMenuViewModel);
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        assert drawer != null;
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+
+        if (mainBinding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mainBinding.drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -147,28 +138,8 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public void updatePageTitle(Weather weather) {
-        currentCityId = weather.getCityId();
-        smartRefreshLayout.finishRefresh();
-        toolbar.setTitle(weather.getCityName());
-        collapsingToolbarLayout.setTitle(weather.getCityName());
+    protected void onDestroy() {
+        super.onDestroy();
 
-        tempTextView.setText(weather.getWeatherLive().getTemp());
-        weatherNameTextView.setText(weather.getWeatherLive().getWeather());
-        realTimeTextView.setText(getString(R.string.string_publish_time) + DateConvertUtils.timeStampToDate(weather.getWeatherLive().getTime(), DateConvertUtils.DATA_FORMAT_PATTEN_YYYY_MM_DD_HH_MM));
-    }
-
-    @Override
-    public void addOrUpdateCityListInDrawerMenu(Weather weather) {
-        drawerMenuPresenter.loadSavedCities();
-    }
-
-    @Override
-    public void onSelect(String cityId) {
-
-        assert drawerLayout != null;
-        drawerLayout.closeDrawer(GravityCompat.START);
-
-        new Handler().postDelayed(() -> homePagePresenter.loadWeather(cityId, false), 250);
     }
 }
