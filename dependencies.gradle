@@ -1,17 +1,18 @@
-def supportVersion = "27.1.1"
-def rxBindingVersion = "0.4.0"
-def retrofitVersion = "2.2.0"
-def okHttpVersion = "3.7.0"
+def supportVersion = "28.0.0"
+def rxBindingVersion = "2.2.0"
+def retrofitVersion = "2.4.0"
+def okHttpVersion = "3.11.0"
 def stethoVersion = "1.5.0"
 def butterKnifeVersion = "8.8.1"
 def daggerVersion = "2.8"
 def ormLiteVersion = "4.48"
 def fastJsonVersion = "1.1.60.android"
-
+def rxjavaVersion = "2.2.2"
+def multiDex = "1.0.3"
 project.ext {
     android = [
-            compileSdkVersion: 27,
-            buildToolsVersion: "27.0.3",
+            compileSdkVersion: 28,
+            buildToolsVersion: "28.0.3",
             applicationId    : "com.baronzhang.android.weather_mvvn",
             minSdkVersion    : 15,
             targetSdkVersion : 27,
@@ -31,16 +32,17 @@ project.ext {
             "stream"                      : "com.annimon:stream:1.0.8",
 
             //rx
-            "rxandroid"                   : "io.reactivex:rxandroid:1.2.1",
-            "rxbinding"                   : "com.jakewharton.rxbinding:rxbinding:${rxBindingVersion}",
-            "rxbinding-support-v4"        : "com.jakewharton.rxbinding:rxbinding-support-v4:${rxBindingVersion}",
-            "rxbinding-appcompat-v7"      : "com.jakewharton.rxbinding:rxbinding-appcompat-v7:${rxBindingVersion}",
-            "rxbinding-design"            : "com.jakewharton.rxbinding:rxbinding-design:${rxBindingVersion}",
-            "rxbinding-recyclerview-v7"   : "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:${rxBindingVersion}",
+            "rxjava"                      : "io.reactivex.rxjava2:rxjava:${rxjavaVersion}",
+            "rxandroid"                   : "io.reactivex.rxjava2:rxandroid:2.1.0",
+            "rxbinding"                   : "com.jakewharton.rxbinding2:rxbinding:${rxBindingVersion}",
+            "rxbinding-support-v4"        : "com.jakewharton.rxbinding2:rxbinding-support-v4:${rxBindingVersion}",
+            "rxbinding-appcompat-v7"      : "com.jakewharton.rxbinding2:rxbinding-appcompat-v7:${rxBindingVersion}",
+            "rxbinding-design"            : "com.jakewharton.rxbinding2:rxbinding-design:${rxBindingVersion}",
+            "rxbinding-recyclerview-v7"   : "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7:${rxBindingVersion}",
 
             //retrofit
             "retrofit"                    : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
-            "adapter-rxjava"              : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
+            "adapter-rxjava"              : "com.squareup.retrofit2:adapter-rxjava2:${retrofitVersion}",
 
             //dagger
             "dagger"                      : "com.google.dagger:dagger:${daggerVersion}",
@@ -52,12 +54,15 @@ project.ext {
 
             //others
             "okhttp3-logging-interceptor" : "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}",
+            "okhttp3"                     : "com.squareup.okhttp3:okhttp:${okHttpVersion}",
             "ormlite-android"             : "com.j256.ormlite:ormlite-android:${ormLiteVersion}",
             "fastjson"                    : "com.alibaba:fastjson:${fastJsonVersion}",
             "butterknife"                 : "com.jakewharton:butterknife:${butterKnifeVersion}",
             "butterknife-compiler"        : "com.jakewharton:butterknife-compiler:${butterKnifeVersion}",
             "retrofit2-fastjson-converter": "com.github.BaronZ88:Retrofit2-FastJson-Converter:1.2",
             "SmartRefreshLayout"          : "com.scwang.smartrefresh:SmartRefreshLayout:1.0.3",
-            "SmartRefreshHeader"          : "com.scwang.smartrefresh:SmartRefreshHeader:1.0.3"
+            "SmartRefreshHeader"          : "com.scwang.smartrefresh:SmartRefreshHeader:1.0.3",
+            "multiDex"                    : "com.android.support:multidex:1.0.3"
+
     ]
 }

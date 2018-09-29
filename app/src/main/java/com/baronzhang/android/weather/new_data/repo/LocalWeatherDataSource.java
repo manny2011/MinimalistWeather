@@ -1,16 +1,22 @@
 package com.baronzhang.android.weather.new_data.repo;
 
-import com.baronzhang.android.weather.new_data.ILocalWeatherDataSource;
 import com.baronzhang.android.weather.new_data.dao.AirQualityLiveDao;
 import com.baronzhang.android.weather.new_data.dao.LifeIndexDao;
 import com.baronzhang.android.weather.new_data.dao.WeatherDao;
 import com.baronzhang.android.weather.new_data.dao.WeatherForecastDao;
 import com.baronzhang.android.weather.new_data.dao.WeatherLiveDao;
+import com.baronzhang.android.weather.new_data.db.AppDatabase;
 import com.baronzhang.android.weather.new_data.entity.Weather;
+import com.j256.ormlite.stmt.query.In;
 
 import java.util.List;
 
+/**
+ * provide only one instance globally.
+ */
 public class LocalWeatherDataSource implements ILocalWeatherDataSource {
+
+    private static volatile LocalWeatherDataSource INSTANCE=null;
 
     private WeatherDao mWeatherDao;
     private WeatherForecastDao mWeatherForecastDao;
@@ -18,12 +24,21 @@ public class LocalWeatherDataSource implements ILocalWeatherDataSource {
     private AirQualityLiveDao mAirQualityLiveDao;
     private WeatherLiveDao mWeatherLiveDao;
 
-    public LocalWeatherDataSource(WeatherDao mWeatherDao, WeatherForecastDao mWeatherForecastDao, LifeIndexDao mLifeIndexDao, AirQualityLiveDao mAirQualityDao, WeatherLiveDao weatherLiveDao) {
-        this.mWeatherDao = mWeatherDao;
-        this.mWeatherForecastDao = mWeatherForecastDao;
-        this.mLifeIndexDao = mLifeIndexDao;
-        this.mAirQualityLiveDao = mAirQualityDao;
-        this.mWeatherLiveDao=weatherLiveDao;
+    private LocalWeatherDataSource(AppDatabase db) {
+        this.mWeatherDao = db.weatherDao();
+        this.mWeatherForecastDao = db.weatherForecastDao();
+        this.mLifeIndexDao = db.lifeIndexDao();
+        this.mAirQualityLiveDao = db.airQualityLiveDao();
+        this.mWeatherLiveDao=db.weatherLiveDao();
+    }
+
+    public static LocalWeatherDataSource getInstance(AppDatabase db){
+        if(INSTANCE==null)
+            synchronized (LocalWeatherDataSource.class){
+                if(INSTANCE==null)
+                    INSTANCE=new LocalWeatherDataSource(db);
+            }
+        return INSTANCE;
     }
 
     @Override

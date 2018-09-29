@@ -2,10 +2,14 @@ package com.baronzhang.android.weather.new_data.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import javax.annotation.Nonnull;
 
 /**
  * 天气实况
@@ -30,6 +34,7 @@ public class WeatherLive {
     public static final String PRESSURE_FIELD_NAME = "airPressure";
 
     @PrimaryKey
+    @NonNull
     @ColumnInfo(name = CITY_ID_FIELD_NAME)
     private String cityId;
     @ColumnInfo(name = WEATHER_FIELD_NAME)
@@ -56,7 +61,7 @@ public class WeatherLive {
 
     public WeatherLive() {
     }
-
+    @Ignore
     public WeatherLive(String cityId, String weather, String temp, String humidity, String wind, String windSpeed, long time) {
 
         this.cityId = cityId;

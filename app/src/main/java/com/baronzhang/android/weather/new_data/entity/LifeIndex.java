@@ -2,7 +2,11 @@ package com.baronzhang.android.weather.new_data.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+
+import javax.annotation.Nonnull;
+
 
 /**
  * @author baron (baronzhang[at]anjuke[dot]com)
@@ -18,6 +22,7 @@ public class LifeIndex {
     public static final String DETAILS_ID_FIELD_NAME = "details";
 
     @PrimaryKey(autoGenerate = true)
+    @Nonnull
     @ColumnInfo(name = ID_FIELD_NAME)
     private long id;//数据库自增长ID
     @ColumnInfo(name = CITY_ID_FIELD_NAME)
@@ -31,7 +36,7 @@ public class LifeIndex {
 
     public LifeIndex() {
     }
-
+    @Ignore
     public LifeIndex(String cityId, String name, String index, String details) {
 
         this.cityId = cityId;

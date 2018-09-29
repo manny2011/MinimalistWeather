@@ -4,7 +4,7 @@
     <data>
         <variable
             name="weather"
-            type="com.baronzhang.android.weather.data.db.entities.minimalist.Weather" />
+            type="com.baronzhang.android.weather.new_data.entity.Weather" />
     </data>
 
     <RelativeLayout

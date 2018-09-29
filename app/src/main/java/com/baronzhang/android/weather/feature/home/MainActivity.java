@@ -5,31 +5,22 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 import com.baronzhang.android.weather.base.BaseActivity;
 import com.baronzhang.android.library.util.ActivityUtils;
 import com.baronzhang.android.library.util.DateConvertUtils;
 import com.baronzhang.android.weather.R;
-import com.baronzhang.android.weather.data.db.entities.minimalist.Weather;
 import com.baronzhang.android.weather.databinding.ActivityMainBinding;
 import com.baronzhang.android.weather.feature.home.drawer.DrawerMenuFragment;
 import com.baronzhang.android.weather.feature.home.drawer.DrawerMenuViewModel;
-import com.scwang.smartrefresh.layout.SmartRefreshLayout;
-import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
-import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
-
-import butterknife.BindView;
 
 /**
  * 首页
@@ -78,7 +69,7 @@ public class MainActivity extends BaseActivity {
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), homePageFragment, R.id.fragment_container);
         }
 
-        homePageViewModel = new HomePageViewModel();
+        homePageViewModel = ViewModelProviders.of(this).get(HomePageViewModel.class);
         homePageViewModel=ViewModelProviders.of(this).get(HomePageViewModel.class);
         homePageFragment.setViewModel(homePageViewModel);
         mainBinding.appBar.refreshLayout.setOnRefreshListener(refreshLayout -> homePageViewModel.loadWeather(drawerMenuViewModel.currentCity.getValue(), true));
@@ -91,9 +82,8 @@ public class MainActivity extends BaseActivity {
             mainBinding.appBar.collapsingToolbar.setTitle(it.getCityName());
             mainBinding.appBar.tempTextView.setText(it.getWeatherLive().getTemp());
             mainBinding.appBar.publishTimeTextView.setText(getString(R.string.string_publish_time) + DateConvertUtils.timeStampToDate(it.getWeatherLive().getTime(), DateConvertUtils.DATA_FORMAT_PATTEN_YYYY_MM_DD_HH_MM));
-            drawerMenuViewModel.loadSavedCities();
+//            drawerMenuViewModel.loadSavedCities();
         });
-
 
         DrawerMenuFragment drawerMenuFragment = (DrawerMenuFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container_drawer_menu);
         drawerMenuViewModel = ViewModelProviders.of(this).get(DrawerMenuViewModel.class);
@@ -102,7 +92,7 @@ public class MainActivity extends BaseActivity {
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), drawerMenuFragment, R.id.fragment_container_drawer_menu);
         }
         drawerMenuViewModel.currentCity.observe(this,it->{
-            homePageViewModel.loadWeather(it,true);
+            homePageViewModel.loadWeather(it,false);
             mainBinding.drawerLayout.closeDrawer(GravityCompat.START);
         });
         drawerMenuFragment.setViewModel(drawerMenuViewModel);

@@ -3,6 +3,9 @@ package com.baronzhang.android.weather.new_data.entity;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
+import javax.annotation.Nonnull;
 
 /**
  * 空气质量实况
@@ -29,6 +32,7 @@ public class AirQualityLive {
     public static final String PRIMARY_FIELD_NAME = "primary";
 
     @PrimaryKey
+    @NonNull
     @ColumnInfo(name = CITY_ID_FIELD_NAME)
     private String cityId;
     @ColumnInfo(name = AQI_FIELD_NAME)

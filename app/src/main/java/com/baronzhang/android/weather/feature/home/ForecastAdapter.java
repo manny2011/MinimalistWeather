@@ -4,21 +4,11 @@ import android.annotation.SuppressLint;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.baronzhang.android.weather.base.BaseRecyclerViewAdapter;
-import com.baronzhang.android.weather.R;
-import com.baronzhang.android.weather.data.WeatherDetail;
-import com.baronzhang.android.weather.data.db.entities.minimalist.WeatherForecast;
 import com.baronzhang.android.weather.databinding.ItemForecastBinding;
-
-import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import com.baronzhang.android.weather.new_data.entity.WeatherForecast;
 
 /**
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com)

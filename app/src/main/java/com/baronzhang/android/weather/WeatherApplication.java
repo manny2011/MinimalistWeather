@@ -3,14 +3,12 @@ package com.baronzhang.android.weather;
 import android.app.Application;
 import android.content.Context;
 import android.os.StrictMode;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.baronzhang.android.weather.data.http.ApiClient;
 import com.baronzhang.android.weather.data.http.ApiConstants;
 import com.baronzhang.android.weather.data.http.configuration.ApiConfiguration;
-import com.baronzhang.android.weather.di.component.ApplicationComponent;
-import com.baronzhang.android.weather.di.component.DaggerApplicationComponent;
-import com.baronzhang.android.weather.di.module.ApplicationModule;
 
 /**
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com)
@@ -32,6 +30,7 @@ public class WeatherApplication extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
+        MultiDex.install(this);
         Log.d(TAG, "attachBaseContext");
     }
 

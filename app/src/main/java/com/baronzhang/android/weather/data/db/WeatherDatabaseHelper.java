@@ -4,11 +4,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.baronzhang.android.weather.data.db.entities.minimalist.AirQualityLive;
-import com.baronzhang.android.weather.data.db.entities.minimalist.WeatherForecast;
-import com.baronzhang.android.weather.data.db.entities.minimalist.LifeIndex;
-import com.baronzhang.android.weather.data.db.entities.minimalist.WeatherLive;
-import com.baronzhang.android.weather.data.db.entities.minimalist.Weather;
+import com.baronzhang.android.weather.new_data.entity.AirQualityLive;
+import com.baronzhang.android.weather.new_data.entity.LifeIndex;
+import com.baronzhang.android.weather.new_data.entity.Weather;
+import com.baronzhang.android.weather.new_data.entity.WeatherForecast;
+import com.baronzhang.android.weather.new_data.entity.WeatherLive;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;

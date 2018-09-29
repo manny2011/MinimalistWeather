@@ -96,11 +96,6 @@ public class DrawerMenuFragment extends BaseFragment implements IOnDeleteCity {
 //        });
         binding.rvCityManager.setAdapter(cityManagerAdapter);
         binding.setVariable(BR.viewModel, viewModel);
-        viewModel.weathers.observe(this, it -> {
-            if (it != null)
-                cityManagerAdapter.notifyDataSetChanged();
-        });
-        viewModel.loadSavedCities();
         return binding.getRoot();
     }
 
@@ -111,6 +106,12 @@ public class DrawerMenuFragment extends BaseFragment implements IOnDeleteCity {
         viewModel.weathers.observe(this, it -> {
             cityManagerAdapter.notifyDataSetChanged();
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        viewModel.loadSavedCities();
     }
 
     @Override

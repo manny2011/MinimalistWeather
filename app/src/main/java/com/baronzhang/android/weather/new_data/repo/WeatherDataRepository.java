@@ -10,7 +10,7 @@ import com.baronzhang.android.weather.data.http.ApiConstants;
 import com.baronzhang.android.weather.data.http.entity.envicloud.EnvironmentCloudCityAirLive;
 import com.baronzhang.android.weather.data.http.entity.envicloud.EnvironmentCloudForecast;
 import com.baronzhang.android.weather.data.http.entity.envicloud.EnvironmentCloudWeatherLive;
-import com.baronzhang.android.weather.new_data.ILocalWeatherDataSource;
+import com.baronzhang.android.weather.new_data.db.AppDatabase;
 import com.baronzhang.android.weather.new_data.entity.Weather;
 
 import java.util.List;
@@ -26,12 +26,24 @@ import io.reactivex.functions.Consumer;
  */
 public class WeatherDataRepository implements IWeatherDataRepository {
 
+    private static volatile WeatherDataRepository INSTANCE = null;
+
     private ILocalWeatherDataSource mLocalWeatherDataSource;//can be injected by Dagger2
     private ApiClient mApiClient;
 
     public WeatherDataRepository(ILocalWeatherDataSource mLocalWeatherDataSource, ApiClient mApiClient) {
         this.mLocalWeatherDataSource = mLocalWeatherDataSource;
         this.mApiClient = mApiClient;
+    }
+
+    public static WeatherDataRepository getInstance(AppDatabase db) {
+        if (INSTANCE == null)
+            synchronized (WeatherDataRepository.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new WeatherDataRepository(LocalWeatherDataSource.getInstance(db),null);
+                }
+            }
+        return INSTANCE;
     }
 
     @Override
@@ -42,7 +54,9 @@ public class WeatherDataRepository implements IWeatherDataRepository {
             @Override
             public void subscribe(ObservableEmitter<Weather> e) {//todo ???需要捕捉异常时,再使用这种原始的创建方式
                 Weather weather = mLocalWeatherDataSource.queryWeather(cityId);
-                e.onNext(weather);
+                if (weather != null) {
+                    e.onNext(weather);
+                }
                 e.onComplete();
             }
         });
@@ -84,6 +98,10 @@ public class WeatherDataRepository implements IWeatherDataRepository {
 
     @Override
     public Observable<List<Weather>> getSavedCityInfo() {
-        return Observable.just(mLocalWeatherDataSource.queryAllSaveCity());
+        return Observable.create(emitter -> {
+            List<Weather> weathers = mLocalWeatherDataSource.queryAllSaveCity();
+            emitter.onNext(weathers);
+            emitter.onComplete();
+        });
     }
 }

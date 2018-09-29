@@ -1,10 +1,10 @@
 package com.baronzhang.android.library.util;
 
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-
+import io.reactivex.Observable;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com)
@@ -18,7 +18,7 @@ public final class RxSchedulerUtils {
      *
      * @return Transformer
      */
-    public static <T> Observable.Transformer<T, T> normalSchedulersTransformer() {
+    public static <T> ObservableTransformer<T, T> normalSchedulersTransformer() {
 
         return observable -> observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

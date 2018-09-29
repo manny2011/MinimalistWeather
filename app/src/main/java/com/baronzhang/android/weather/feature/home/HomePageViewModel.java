@@ -1,45 +1,37 @@
 package com.baronzhang.android.weather.feature.home;
 
-import android.arch.lifecycle.LiveData;
+import android.annotation.SuppressLint;
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.widget.Toast;
 
-import com.baronzhang.android.library.util.RxSchedulerUtils;
 import com.baronzhang.android.weather.R;
 import com.baronzhang.android.weather.WeatherApplication;
 import com.baronzhang.android.weather.data.WeatherDetail;
-import com.baronzhang.android.weather.data.db.WeatherDatabaseHelper;
-import com.baronzhang.android.weather.data.db.dao.WeatherDao;
-import com.baronzhang.android.weather.data.db.entities.minimalist.LifeIndex;
-import com.baronzhang.android.weather.data.db.entities.minimalist.Weather;
-import com.baronzhang.android.weather.data.db.entities.minimalist.WeatherForecast;
 import com.baronzhang.android.weather.data.preference.PreferenceHelper;
 import com.baronzhang.android.weather.data.preference.WeatherSettings;
-import com.baronzhang.android.weather.data.repository.WeatherDataRepository;
-import com.j256.ormlite.dao.Dao;
+import com.baronzhang.android.weather.new_data.entity.LifeIndex;
+import com.baronzhang.android.weather.new_data.entity.Weather;
+import com.baronzhang.android.weather.new_data.entity.WeatherForecast;
+import com.baronzhang.android.weather.new_data.util.InjectorUtils;
+import com.baronzhang.android.weather.new_data.util.RxSchedulerUtils;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
+public class HomePageViewModel extends AndroidViewModel {
 
-public class HomePageViewModel extends ViewModel {
+//    private CompositeSubscription subscriptions = new CompositeSubscription();
 
-    private CompositeSubscription subscriptions=new CompositeSubscription();
-
-    public MutableLiveData<String> currentCity=new MutableLiveData<>();
-    public MutableLiveData<Weather> weather=new MutableLiveData<>();
+    public MutableLiveData<Weather> weather = new MutableLiveData<>();
 
     public MutableLiveData<List<WeatherDetail>> weatherDetails = new MutableLiveData<>();
     public MutableLiveData<List<WeatherForecast>> weatherForecasts = new MutableLiveData<>();
     public MutableLiveData<List<LifeIndex>> lifeIndices = new MutableLiveData<>();
 
-    public HomePageViewModel() {
-        String cityId = PreferenceHelper.getSharedPreferences().getString(WeatherSettings.SETTINGS_CURRENT_CITY_ID.getId(), "");
-        currentCity.setValue(cityId);
+    public HomePageViewModel(Application application) {
+        super(application);
         weatherDetails.setValue(new ArrayList<>());
         weatherForecasts.setValue(new ArrayList<>());
         lifeIndices.setValue(new ArrayList<>());
@@ -58,13 +50,11 @@ public class HomePageViewModel extends ViewModel {
         return details;
     }
 
+    @SuppressLint("CheckResult")
     public void loadWeather(String cityId, boolean refreshNow) {
-//        Dao<Weather, ?> weatherDao = WeatherDatabaseHelper.getInstance(WeatherApplication.getInstance()).getWeatherDao(Weather.class);
-//        WeatherDatabaseHelper.getInstance(WeatherApplication.getInstance()).getWeatherDao(Weather.class);
-        WeatherDao weatherDao = new WeatherDao(WeatherApplication.getInstance());
-        Subscription subscription = WeatherDataRepository.getWeather( cityId, weatherDao, refreshNow)
+        InjectorUtils.getWeatherDataRepository(getApplication()).getWeather(cityId, refreshNow)
                 .compose(RxSchedulerUtils.normalSchedulersTransformer())
-                .subscribe(it->{
+                .subscribe(it -> {
                     weather.setValue(it);
                     weatherDetails.setValue(createDetails(it));
                     weatherForecasts.setValue(it.getWeatherForecasts());
@@ -72,12 +62,12 @@ public class HomePageViewModel extends ViewModel {
                 }, throwable -> {
                     Toast.makeText(WeatherApplication.getInstance(), throwable.getMessage(), Toast.LENGTH_LONG).show();
                 });
-        subscriptions.add(subscription);
+//        subscriptions.add(subscription);
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-        subscriptions.clear();
+//        subscriptions.clear();
     }
 }

@@ -3,8 +3,11 @@ package com.baronzhang.android.weather.new_data.entity;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 import com.j256.ormlite.table.DatabaseTable;
+
+import javax.annotation.Nonnull;
 
 /**
  * 天气预报
@@ -38,6 +41,7 @@ public class WeatherForecast {
     public static final String MOONSET_FIELD_NAME = "moonset";
 
     @PrimaryKey(autoGenerate = true)
+    @NonNull
     @ColumnInfo(name = ID_FIELD_NAME)
     private long id;//数据库自增长ID
     @ColumnInfo(name = CITY_ID_FIELD_NAME)

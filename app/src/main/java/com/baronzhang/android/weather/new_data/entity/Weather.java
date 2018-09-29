@@ -4,11 +4,14 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 /**
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com)
@@ -22,6 +25,7 @@ public class Weather {
     public static final String CITY_NAME_EN_FIELD_NAME = "cityNameEn";
 
     @PrimaryKey
+    @NonNull
     @ColumnInfo(name = CITY_ID_FIELD_NAME)
     private String cityId;
     @ColumnInfo(name = CITY_NAME_FIELD_NAME)

@@ -28,7 +28,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
     api rootProject.ext.dependencies["support-v4"]
     api rootProject.ext.dependencies["appcompat-v7"]
@@ -36,6 +36,7 @@ dependencies {
     api rootProject.ext.dependencies["recyclerview"]
     api rootProject.ext.dependencies["cardview"]
     api rootProject.ext.dependencies["rxandroid"]
+    api rootProject.ext.dependencies["rxjava"]
     api rootProject.ext.dependencies["rxbinding"]
     api rootProject.ext.dependencies["rxbinding-support-v4"]
     api rootProject.ext.dependencies["rxbinding-appcompat-v7"]
@@ -47,12 +48,9 @@ dependencies {
     api rootProject.ext.dependencies["adapter-rxjava"]
     api rootProject.ext.dependencies["fastjson"]
     api rootProject.ext.dependencies["okhttp3-logging-interceptor"]
-
     debugApi rootProject.ext.dependencies["stetho"]
     debugApi rootProject.ext.dependencies["stetho-okhttp3"]
-
     api rootProject.ext.dependencies["SmartRefreshLayout"]
     api rootProject.ext.dependencies["SmartRefreshHeader"]
-
     api 'org.glassfish:javax.annotation:10.0-b28'
 }

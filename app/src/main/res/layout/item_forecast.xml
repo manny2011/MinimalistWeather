@@ -4,7 +4,7 @@
     <data>
         <variable
             name="forcast"
-            type="com.baronzhang.android.weather.data.db.entities.minimalist.WeatherForecast"/>
+            type="com.baronzhang.android.weather.new_data.entity.WeatherForecast"/>
     </data>
 
     <RelativeLayout

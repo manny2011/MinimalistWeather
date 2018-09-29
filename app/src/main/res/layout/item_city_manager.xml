@@ -6,7 +6,7 @@
         <import type="com.baronzhang.android.library.util.DateConvertUtils"/>
         <variable
             name="weather"
-            type="com.baronzhang.android.weather.data.db.entities.minimalist.Weather" />
+            type="com.baronzhang.android.weather.new_data.entity.Weather" />
     </data>
 
     <android.support.v7.widget.CardView

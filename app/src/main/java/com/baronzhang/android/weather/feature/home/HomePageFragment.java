@@ -12,17 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.baronzhang.android.weather.BR;
-import com.baronzhang.android.weather.R;
 import com.baronzhang.android.weather.base.BaseFragment;
-import com.baronzhang.android.weather.data.WeatherDetail;
-import com.baronzhang.android.weather.data.db.entities.minimalist.AirQualityLive;
-import com.baronzhang.android.weather.data.db.entities.minimalist.Weather;
 import com.baronzhang.android.weather.data.preference.PreferenceHelper;
 import com.baronzhang.android.weather.data.preference.WeatherSettings;
 import com.baronzhang.android.weather.databinding.FragmentHomePageBinding;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.baronzhang.android.weather.new_data.entity.AirQualityLive;
 
 public class HomePageFragment extends BaseFragment {
 

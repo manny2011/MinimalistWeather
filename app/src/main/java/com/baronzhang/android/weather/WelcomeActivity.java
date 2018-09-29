@@ -1,21 +1,22 @@
 package com.baronzhang.android.weather;
 
-import android.arch.lifecycle.ViewModelProviders;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.baronzhang.android.weather.base.BaseActivity;
 import com.baronzhang.android.library.util.system.StatusBarHelper;
-import com.baronzhang.android.weather.feature.home.MainActivity;
+import com.baronzhang.android.weather.base.BaseActivity;
 import com.baronzhang.android.weather.data.db.CityDatabaseHelper;
 import com.baronzhang.android.weather.data.preference.PreferenceHelper;
 import com.baronzhang.android.weather.data.preference.WeatherSettings;
+import com.baronzhang.android.weather.feature.home.MainActivity;
 
 import java.io.InvalidClassException;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 
 /**
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com)
@@ -23,6 +24,7 @@ import rx.schedulers.Schedulers;
 public class WelcomeActivity extends BaseActivity {
 
 
+    @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +59,6 @@ public class WelcomeActivity extends BaseActivity {
             }
         }
         CityDatabaseHelper.importCityDB();
-        return null;
+        return "null item is not allowed in rxJava2";
     }
 }

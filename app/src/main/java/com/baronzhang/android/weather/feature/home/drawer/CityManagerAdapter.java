@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import com.baronzhang.android.weather.base.BaseRecyclerViewAdapter;
 import com.baronzhang.android.library.util.DateConvertUtils;
 import com.baronzhang.android.weather.R;
-import com.baronzhang.android.weather.data.db.entities.minimalist.Weather;
 import com.baronzhang.android.weather.databinding.ItemCityManagerBinding;
+import com.baronzhang.android.weather.new_data.entity.Weather;
 
 /**
  * 城市管理页面Adapter

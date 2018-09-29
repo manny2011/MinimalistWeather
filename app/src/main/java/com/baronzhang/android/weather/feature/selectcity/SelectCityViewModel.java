@@ -3,19 +3,11 @@ package com.baronzhang.android.weather.feature.selectcity;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.content.Context;
-import android.content.Intent;
-import android.databinding.ObservableArrayList;
-import android.databinding.ObservableList;
-import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.baronzhang.android.weather.WelcomeActivity;
 import com.baronzhang.android.weather.data.db.CityDatabaseHelper;
-import com.baronzhang.android.weather.data.db.dao.CityDao;
 import com.baronzhang.android.weather.data.db.entities.City;
 import com.baronzhang.android.weather.data.preference.PreferenceHelper;
 import com.baronzhang.android.weather.data.preference.WeatherSettings;
@@ -27,11 +19,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.Observer;
-import rx.Scheduler;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 
 public class SelectCityViewModel extends AndroidViewModel implements RecyclerItemMultiLister {
 
@@ -53,7 +46,7 @@ public class SelectCityViewModel extends AndroidViewModel implements RecyclerIte
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<List<City>>() {
                         @Override
-                        public void onCompleted() {
+                        public void onComplete() {
 
                         }
 
@@ -65,6 +58,11 @@ public class SelectCityViewModel extends AndroidViewModel implements RecyclerIte
                         @Override
                         public void onNext(List<City> cities) {
                             items.setValue(cities);
+                        }
+
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
                         }
                     });
         } catch (SQLException e) {

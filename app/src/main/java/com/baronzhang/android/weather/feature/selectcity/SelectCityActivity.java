@@ -1,29 +1,23 @@
 package com.baronzhang.android.weather.feature.selectcity;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.baronzhang.android.weather.base.BaseActivity;
 import com.baronzhang.android.library.util.ActivityUtils;
 import com.baronzhang.android.weather.R;
-import com.baronzhang.android.weather.WeatherApplication;
+import com.baronzhang.android.weather.base.BaseActivity;
 import com.baronzhang.android.weather.databinding.ActivitySelectCityBinding;
-import com.jakewharton.rxbinding.support.v7.widget.RxSearchView;
+import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com ==>> baronzhang.com)
@@ -66,6 +60,7 @@ public class SelectCityActivity extends BaseActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

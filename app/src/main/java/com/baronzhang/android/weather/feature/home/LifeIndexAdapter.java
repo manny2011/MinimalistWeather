@@ -4,20 +4,12 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.baronzhang.android.weather.base.BaseRecyclerViewAdapter;
 import com.baronzhang.android.weather.R;
-import com.baronzhang.android.weather.data.db.entities.minimalist.LifeIndex;
 import com.baronzhang.android.weather.databinding.ItemLifeIndexBinding;
-
-import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import com.baronzhang.android.weather.new_data.entity.LifeIndex;
 
 import static com.baronzhang.android.weather.R.drawable.ic_index_sunscreen;
 
