@@ -104,14 +104,16 @@ public class DrawerMenuFragment extends BaseFragment implements IOnDeleteCity {
         super.onActivityCreated(savedInstanceState);
 
         viewModel.weathers.observe(this, it -> {
-            cityManagerAdapter.notifyDataSetChanged();
+            if (it != null && it.size() > 0)
+                cityManagerAdapter.notifyDataSetChanged();
         });
+        viewModel.loadSavedCities();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        viewModel.loadSavedCities();
+//        viewModel.loadSavedCities();
     }
 
     @Override

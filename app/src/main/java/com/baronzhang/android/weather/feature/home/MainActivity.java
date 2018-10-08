@@ -82,7 +82,7 @@ public class MainActivity extends BaseActivity {
             mainBinding.appBar.collapsingToolbar.setTitle(it.getCityName());
             mainBinding.appBar.tempTextView.setText(it.getWeatherLive().getTemp());
             mainBinding.appBar.publishTimeTextView.setText(getString(R.string.string_publish_time) + DateConvertUtils.timeStampToDate(it.getWeatherLive().getTime(), DateConvertUtils.DATA_FORMAT_PATTEN_YYYY_MM_DD_HH_MM));
-//            drawerMenuViewModel.loadSavedCities();
+            drawerMenuViewModel.loadSavedCities();
         });
 
         DrawerMenuFragment drawerMenuFragment = (DrawerMenuFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container_drawer_menu);

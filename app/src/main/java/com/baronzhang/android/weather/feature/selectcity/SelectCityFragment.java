@@ -70,6 +70,8 @@ public class SelectCityFragment extends BaseFragment implements IOnSelectCity {
     public void onSelectCity(String cityId) {
         try {
             selectCityViewModel.saveCurrentCityToPreference(cityId);
+//            Toast.makeText(this.getActivity(), selectedCity.getCityName(), Toast.LENGTH_LONG).show();
+
         } catch (InvalidClassException e) {
             e.printStackTrace();
         } finally {
