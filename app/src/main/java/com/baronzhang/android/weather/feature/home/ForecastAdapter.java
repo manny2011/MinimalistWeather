@@ -8,7 +8,11 @@ import android.view.ViewGroup;
 
 import com.baronzhang.android.weather.base.BaseRecyclerViewAdapter;
 import com.baronzhang.android.weather.databinding.ItemForecastBinding;
+import com.baronzhang.android.weather.new_data.entity.Weather;
 import com.baronzhang.android.weather.new_data.entity.WeatherForecast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com)
@@ -17,9 +21,16 @@ import com.baronzhang.android.weather.new_data.entity.WeatherForecast;
 public class ForecastAdapter extends BaseRecyclerViewAdapter<ForecastAdapter.ViewHolder> {
 
     private HomePageViewModel homePageViewModel;
+    private List<WeatherForecast> items=new ArrayList<>(0);
 
     public ForecastAdapter(HomePageViewModel homePageViewModel) {
         this.homePageViewModel=homePageViewModel;
+    }
+
+    public void replaceData(List<WeatherForecast> items){
+        this.items.clear();
+        this.items.addAll(items);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -31,13 +42,13 @@ public class ForecastAdapter extends BaseRecyclerViewAdapter<ForecastAdapter.Vie
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(ForecastAdapter.ViewHolder holder, int position) {
-        WeatherForecast weatherForecast = homePageViewModel.weatherForecasts.getValue().get(position);
+        WeatherForecast weatherForecast=items.get(position);
         holder.bindData(weatherForecast);
     }
 
     @Override
     public int getItemCount() {
-        return homePageViewModel.weatherForecasts.getValue().size();
+        return items.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -53,6 +64,7 @@ public class ForecastAdapter extends BaseRecyclerViewAdapter<ForecastAdapter.Vie
                     (weatherForecast.getWeatherDay().equals(weatherForecast.getWeatherNight()) ?
                             weatherForecast.getWeatherDay() : weatherForecast.getWeatherDay() + "转" + weatherForecast.getWeatherNight())
                     : weatherForecast.getWeather());
+            itemForecastBinding.executePendingBindings();
         }
     }
 }

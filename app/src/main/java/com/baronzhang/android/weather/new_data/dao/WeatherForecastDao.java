@@ -15,7 +15,7 @@ import java.util.List;
 @Dao
 public interface WeatherForecastDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertOrUpdateWeatherForecast(List<WeatherForecast> weatherForecasts);
+    void insertWeatherForecast(List<WeatherForecast> weatherForecasts);
 
     @Delete
     void deleteWeatherForecast(WeatherForecast... weatherForecasts);
@@ -25,4 +25,7 @@ public interface WeatherForecastDao {
 
     @Query(value = "SELECT * FROM weatherforecast WHERE cityId = :cityId")
     List<WeatherForecast> queryWeatherForecast(String cityId);
+
+    @Query(value = "DELETE FROM weatherforecast WHERE cityId = :cityId")
+    void deleteWeatherForecastById(String cityId);
 }

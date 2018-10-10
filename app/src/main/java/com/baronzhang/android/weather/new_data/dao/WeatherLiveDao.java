@@ -19,4 +19,6 @@ public interface WeatherLiveDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertOrUpdateWeatherLive(WeatherLive weatherLive);
 
+    @Query(value = "DELETE FROM weatherlive WHERE cityId = :cityId")
+    void deleteWeatherLiveByCityId(String cityId);
 }

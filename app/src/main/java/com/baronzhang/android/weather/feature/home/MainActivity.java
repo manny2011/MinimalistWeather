@@ -5,8 +5,10 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +19,8 @@ import com.baronzhang.android.weather.base.BaseActivity;
 import com.baronzhang.android.library.util.ActivityUtils;
 import com.baronzhang.android.library.util.DateConvertUtils;
 import com.baronzhang.android.weather.R;
+import com.baronzhang.android.weather.data.preference.PreferenceHelper;
+import com.baronzhang.android.weather.data.preference.WeatherSettings;
 import com.baronzhang.android.weather.databinding.ActivityMainBinding;
 import com.baronzhang.android.weather.feature.home.drawer.DrawerMenuFragment;
 import com.baronzhang.android.weather.feature.home.drawer.DrawerMenuViewModel;
@@ -47,7 +51,6 @@ public class MainActivity extends BaseActivity {
         }
 
         ActivityMainBinding mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-//         mainBinding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setSupportActionBar(mainBinding.appBar.toolbar);
         //设置 Header 为 Material风格
         ClassicsHeader header = new ClassicsHeader(this);
@@ -55,7 +58,10 @@ public class MainActivity extends BaseActivity {
         mainBinding.appBar.refreshLayout.setRefreshHeader(header);
 
         mainBinding.appBar.refreshLayout.setOnRefreshListener(refreshlayout -> {
-            homePageViewModel.loadWeather(drawerMenuViewModel.currentCity.getValue(),true);
+            long start=System.currentTimeMillis();
+            String currentCityId = PreferenceHelper.getSharedPreferences().getString(WeatherSettings.SETTINGS_CURRENT_CITY_ID.getId(), "");
+            homePageViewModel.loadWeather(currentCityId,true);
+            Log.e("interval", "onCreate: refresh Time Interval: "+(System.currentTimeMillis()-start));
         });
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mainBinding.drawerLayout, mainBinding.appBar.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -69,15 +75,14 @@ public class MainActivity extends BaseActivity {
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), homePageFragment, R.id.fragment_container);
         }
 
-        homePageViewModel = ViewModelProviders.of(this).get(HomePageViewModel.class);
         homePageViewModel=ViewModelProviders.of(this).get(HomePageViewModel.class);
         homePageFragment.setViewModel(homePageViewModel);
-        mainBinding.appBar.refreshLayout.setOnRefreshListener(refreshLayout -> homePageViewModel.loadWeather(drawerMenuViewModel.currentCity.getValue(), true));
 
         homePageViewModel.weather.observe(this, it -> {
             if(mainBinding.appBar.refreshLayout.isRefreshing()){
                 mainBinding.appBar.refreshLayout.finishRefresh(true);
             }
+            mainBinding.appBar.refreshLayout.finishRefresh();
             mainBinding.appBar.toolbar.setTitle(it.getCityName());
             mainBinding.appBar.collapsingToolbar.setTitle(it.getCityName());
             mainBinding.appBar.tempTextView.setText(it.getWeatherLive().getTemp());
@@ -92,8 +97,10 @@ public class MainActivity extends BaseActivity {
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), drawerMenuFragment, R.id.fragment_container_drawer_menu);
         }
         drawerMenuViewModel.currentCity.observe(this,it->{
-            homePageViewModel.loadWeather(it,false);
             mainBinding.drawerLayout.closeDrawer(GravityCompat.START);
+            long start=System.currentTimeMillis();
+            new Handler().postDelayed(()->homePageViewModel.loadWeather(it,false),260);
+            Log.e("interval", "onCreate: switchCity Time Interval: "+(System.currentTimeMillis()-start));
         });
         drawerMenuFragment.setViewModel(drawerMenuViewModel);
     }

@@ -84,7 +84,7 @@ public class CityListAdapter extends BaseRecyclerViewAdapter<CityListAdapter.Vie
             binding.setCity(city);
             binding.getRoot().setOnClickListener(v-> {
                 if(onSelectCity!=null)
-                    onSelectCity.onSelectCity(String.valueOf(city.getCityId()));
+                    onSelectCity.onSelectCity(city);
             });
             binding.executePendingBindings();
         }

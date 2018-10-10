@@ -23,4 +23,11 @@ public interface IWeatherDataRepository {
      * @return
      */
     Observable<List<Weather>> getSavedCityInfo();
+
+    /**
+     * delete selected city and return current cityId(which may be changed to a default cityId )
+     * @param weather city to be deleted
+     * @return current cityId
+     */
+    Observable<String> deleteCity(Weather weather);
 }

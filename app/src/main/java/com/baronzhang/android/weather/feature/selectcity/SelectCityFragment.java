@@ -67,11 +67,10 @@ public class SelectCityFragment extends BaseFragment implements IOnSelectCity {
     }
 
     @Override
-    public void onSelectCity(String cityId) {
+    public void onSelectCity(City city) {
         try {
-            selectCityViewModel.saveCurrentCityToPreference(cityId);
-//            Toast.makeText(this.getActivity(), selectedCity.getCityName(), Toast.LENGTH_LONG).show();
-
+            selectCityViewModel.saveCurrentCityToPreference(String.valueOf(city.getCityId()));
+            Toast.makeText(this.getActivity(), city.getCityName(), Toast.LENGTH_LONG).show();
         } catch (InvalidClassException e) {
             e.printStackTrace();
         } finally {

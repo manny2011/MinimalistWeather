@@ -4,10 +4,13 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,7 @@ import com.baronzhang.android.weather.BR;
 import com.baronzhang.android.weather.base.BaseFragment;
 import com.baronzhang.android.weather.databinding.FragmentDrawerMenuBinding;
 import com.baronzhang.android.weather.feature.selectcity.SelectCityActivity;
+import com.baronzhang.android.weather.new_data.entity.Weather;
 
 import java.io.InvalidClassException;
 
@@ -104,8 +108,7 @@ public class DrawerMenuFragment extends BaseFragment implements IOnDeleteCity {
         super.onActivityCreated(savedInstanceState);
 
         viewModel.weathers.observe(this, it -> {
-            if (it != null && it.size() > 0)
-                cityManagerAdapter.notifyDataSetChanged();
+            cityManagerAdapter.replaceData(it);
         });
         viewModel.loadSavedCities();
     }
@@ -123,15 +126,20 @@ public class DrawerMenuFragment extends BaseFragment implements IOnDeleteCity {
 
 
     @Override
-    public void onDelete(String cityId) {
-        viewModel.deleteCity(cityId);
+    public void onDelete(Weather weather) {
+        viewModel.deleteCity(weather);
     }
 
     @Override
-    public void onSelect(String cityId) {
+    public void onSelect(Weather weather) {
         try {
-            viewModel.saveCurrentCityToPreference(cityId);//event to viewModel
-            viewModel.currentCity.setValue(cityId);
+            String cityId=weather.getCityId();
+            if(!TextUtils.equals(cityId,viewModel.currentCity.getValue())){
+                long start=System.currentTimeMillis();
+                viewModel.saveCurrentCityToPreference(cityId);//event to viewModel
+                viewModel.currentCity.setValue(cityId);
+                Log.e("interval", "onSelect: 更改当前城市ID: "+(System.currentTimeMillis()-start));
+            }
         } catch (InvalidClassException e) {
             e.printStackTrace();
         }

@@ -19,6 +19,8 @@ import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
+
 public class DrawerMenuViewModel extends AndroidViewModel implements RecyclerItemMultiLister {
 
     public MutableLiveData<List<Weather>> weathers = new MutableLiveData<>();
@@ -41,20 +43,13 @@ public class DrawerMenuViewModel extends AndroidViewModel implements RecyclerIte
 
     }
 
-    public void deleteCity(String cityId) {
+    @SuppressLint("CheckResult")
+    public void deleteCity(Weather weather) {
 
-//        Observable.just(deleteCityFromDBAndReturnCurrentCityId(cityId))
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(currentCityId -> {
-//                    if (currentCityId == null)
-//                        return;
-//                    try {
-//                        PreferenceHelper.savePreference(WeatherSettings.SETTINGS_CURRENT_CITY_ID, currentCityId);
-//                    } catch (InvalidClassException e) {
-//                        e.printStackTrace();
-//                    }
-//                });
+        InjectorUtils.getWeatherDataRepository(getApplication())
+                .deleteCity(weather)
+                .compose(RxSchedulerUtils.normalSchedulersTransformer())
+                .subscribe(this::saveCurrentCityToPreference);
     }
 
 //    private String deleteCityFromDBAndReturnCurrentCityId(String cityId) {
@@ -74,8 +69,9 @@ public class DrawerMenuViewModel extends AndroidViewModel implements RecyclerIte
 //        return currentCityId;
 //    }
 
-    public void saveCurrentCityToPreference(String cityId) throws InvalidClassException{
-        PreferenceHelper.savePreference(WeatherSettings.SETTINGS_CURRENT_CITY_ID, cityId);
+    public void saveCurrentCityToPreference(String currentCityId) throws InvalidClassException{
+        PreferenceHelper.savePreference(WeatherSettings.SETTINGS_CURRENT_CITY_ID, currentCityId);
+        this.currentCity.setValue(currentCityId);
     }
 
     @Override

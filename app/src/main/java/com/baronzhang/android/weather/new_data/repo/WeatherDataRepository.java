@@ -1,5 +1,7 @@
 package com.baronzhang.android.weather.new_data.repo;
 
+import android.text.TextUtils;
+
 import com.baronzhang.android.library.util.NetworkUtils;
 import com.baronzhang.android.weather.WeatherApplication;
 import com.baronzhang.android.weather.data.db.entities.adapter.CloudWeatherAdapter;
@@ -10,6 +12,8 @@ import com.baronzhang.android.weather.data.http.ApiConstants;
 import com.baronzhang.android.weather.data.http.entity.envicloud.EnvironmentCloudCityAirLive;
 import com.baronzhang.android.weather.data.http.entity.envicloud.EnvironmentCloudForecast;
 import com.baronzhang.android.weather.data.http.entity.envicloud.EnvironmentCloudWeatherLive;
+import com.baronzhang.android.weather.data.preference.PreferenceHelper;
+import com.baronzhang.android.weather.data.preference.WeatherSettings;
 import com.baronzhang.android.weather.new_data.db.AppDatabase;
 import com.baronzhang.android.weather.new_data.entity.Weather;
 
@@ -19,6 +23,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * The significant meaning of introducing RX here is to avoid the annoying thread-switching operations
@@ -40,7 +45,7 @@ public class WeatherDataRepository implements IWeatherDataRepository {
         if (INSTANCE == null)
             synchronized (WeatherDataRepository.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new WeatherDataRepository(LocalWeatherDataSource.getInstance(db),null);
+                    INSTANCE = new WeatherDataRepository(LocalWeatherDataSource.getInstance(db), null);
                 }
             }
         return INSTANCE;
@@ -57,6 +62,7 @@ public class WeatherDataRepository implements IWeatherDataRepository {
                 if (weather != null) {
                     e.onNext(weather);
                 }
+                System.err.println("查询数据库某个城市天气所在线程: " + Thread.currentThread().getName());
                 e.onComplete();
             }
         });
@@ -82,12 +88,18 @@ public class WeatherDataRepository implements IWeatherDataRepository {
                 Observable<EnvironmentCloudCityAirLive> airLiveObservable = ApiClient.environmentCloudWeatherService.getAirLive(cityId);
 
                 observableForGetWeatherFromNetWork = Observable.combineLatest(weatherLiveObservable, forecastObservable, airLiveObservable,
-                        (environmentCloudWeatherLive, environmentCloudForecast, environmentCloudCityAirLive) -> new CloudWeatherAdapter(environmentCloudWeatherLive, environmentCloudForecast, environmentCloudCityAirLive).getWeather()).doOnNext(new Consumer<Weather>() {
-                    @Override
-                    public void accept(Weather weather) throws Exception {
-                        mLocalWeatherDataSource.insertOrUpdateWeather(weather);
-                    }
-                });
+                        (environmentCloudWeatherLive, environmentCloudForecast, environmentCloudCityAirLive) ->
+                                new CloudWeatherAdapter(environmentCloudWeatherLive, environmentCloudForecast, environmentCloudCityAirLive).getWeather())
+                        .doOnNext(new Consumer<Weather>() {
+                            @Override
+                            public void accept(Weather weather) throws Exception {
+//                                Schedulers.io().createWorker()//非阻塞式: 通过Worker可以让数据流直接向下传递给OnNext()消耗,而不用等到accept()方法执行完成.
+//                                        .schedule(() -> {
+                                mLocalWeatherDataSource.insertOrUpdateWeather(weather);//这里需要用这种阻塞式
+                                System.err.println("doOnNext更新数据库所在线程: " + Thread.currentThread().getName());
+//                                        });
+                            }
+                        });
 
                 break;
         }
@@ -99,9 +111,33 @@ public class WeatherDataRepository implements IWeatherDataRepository {
     @Override
     public Observable<List<Weather>> getSavedCityInfo() {
         return Observable.create(emitter -> {
+            System.err.println("查询数据库城市列表所在线程: " + Thread.currentThread().getName());
             List<Weather> weathers = mLocalWeatherDataSource.queryAllSaveCity();
             emitter.onNext(weathers);
             emitter.onComplete();
         });
     }
+
+    @Override
+    public Observable<String> deleteCity(Weather weather) {
+        return Observable.create(emitter -> {
+            String cityId = weather.getCityId();
+            String currentCityId = PreferenceHelper.getSharedPreferences().getString(WeatherSettings.SETTINGS_CURRENT_CITY_ID.getId(), "");
+            mLocalWeatherDataSource.deleteWeatherByCityId(cityId);
+            if (TextUtils.equals(currentCityId, cityId)) {
+                List<Weather> weathers = mLocalWeatherDataSource.queryAllSaveCity();
+                if (weathers.size() > 0) {
+                    emitter.onNext(weathers.get(0).getCityId());
+                } else {
+                    emitter.onNext(WeatherApplication.DEFAULT_CITY_ID);
+                }
+            } else {
+                emitter.onNext(currentCityId);
+            }
+            System.err.println("删除数据库中某个城市的天气所在线程: " + Thread.currentThread().getName());
+            emitter.onComplete();
+        });
+    }
+
+
 }

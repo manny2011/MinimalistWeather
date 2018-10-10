@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.baronzhang.android.weather.R;
@@ -20,21 +21,17 @@ import com.baronzhang.android.weather.new_data.util.RxSchedulerUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 public class HomePageViewModel extends AndroidViewModel {
 
 //    private CompositeSubscription subscriptions = new CompositeSubscription();
-
     public MutableLiveData<Weather> weather = new MutableLiveData<>();
-
-    public MutableLiveData<List<WeatherDetail>> weatherDetails = new MutableLiveData<>();
-    public MutableLiveData<List<WeatherForecast>> weatherForecasts = new MutableLiveData<>();
-    public MutableLiveData<List<LifeIndex>> lifeIndices = new MutableLiveData<>();
 
     public HomePageViewModel(Application application) {
         super(application);
-        weatherDetails.setValue(new ArrayList<>());
-        weatherForecasts.setValue(new ArrayList<>());
-        lifeIndices.setValue(new ArrayList<>());
     }
 
     private List<WeatherDetail> createDetails(Weather weather) {
@@ -52,16 +49,20 @@ public class HomePageViewModel extends AndroidViewModel {
 
     @SuppressLint("CheckResult")
     public void loadWeather(String cityId, boolean refreshNow) {
-        InjectorUtils.getWeatherDataRepository(getApplication()).getWeather(cityId, refreshNow)
-                .compose(RxSchedulerUtils.normalSchedulersTransformer())
+        long start=System.currentTimeMillis();
+        InjectorUtils.getWeatherDataRepository(getApplication())
+                .getWeather(cityId, refreshNow)
+//                .compose(RxSchedulerUtils.normalSchedulersTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(it -> {
+                    it.setWeatherDetails(createDetails(it));
                     weather.setValue(it);
-                    weatherDetails.setValue(createDetails(it));
-                    weatherForecasts.setValue(it.getWeatherForecasts());
-                    lifeIndices.setValue(it.getLifeIndexes());
                 }, throwable -> {
                     Toast.makeText(WeatherApplication.getInstance(), throwable.getMessage(), Toast.LENGTH_LONG).show();
                 });
+        Log.e("interval", "onCreate: load Weather request Interval: "+(System.currentTimeMillis()-start));
+
 //        subscriptions.add(subscription);
     }
 

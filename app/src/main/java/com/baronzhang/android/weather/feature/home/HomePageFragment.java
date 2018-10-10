@@ -7,6 +7,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,6 +90,7 @@ public class HomePageFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         homePageViewModel.weather.observe(this, it -> {
+            long start=System.currentTimeMillis();
             AirQualityLive airQualityLive = it.getAirQualityLive();
             binding.indicatorViewAqi.setIndicatorValue(airQualityLive.getAqi());
             binding.tvAdvice.setText(airQualityLive.getAdvice());
@@ -96,10 +98,13 @@ public class HomePageFragment extends BaseFragment {
             binding.tvQuality.setText(airQualityLive.getQuality());
             String rank = airQualityLive.getCityRank();
             binding.tvCityRank.setText(TextUtils.isEmpty(rank) ? "首要污染物: " + airQualityLive.getPrimary() : rank);
-            //通知Activity去更新界面?
-            detailAdapter.notifyDataSetChanged();
-            forecastAdapter.notifyDataSetChanged();
-            lifeIndexAdapter.notifyDataSetChanged();
+//            //通知Activity去更新界面?
+            detailAdapter.replaceData(it.getWeatherDetails());
+            forecastAdapter.replaceData(it.getWeatherForecasts());
+            lifeIndexAdapter.replaceData(it.getLifeIndexes());
+
+            System.err.println("更新UI线程: " + Thread.currentThread().getName());
+            Log.e("interval","更新HomeFragView interval: "+(System.currentTimeMillis()-start));
         });
     }
 

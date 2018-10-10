@@ -11,7 +11,9 @@ import com.baronzhang.android.weather.base.BaseRecyclerViewAdapter;
 import com.baronzhang.android.weather.R;
 import com.baronzhang.android.weather.data.WeatherDetail;
 import com.baronzhang.android.weather.databinding.ItemDetailBinding;
+import com.baronzhang.android.weather.new_data.entity.Weather;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -24,9 +26,16 @@ import butterknife.ButterKnife;
 public class DetailAdapter extends BaseRecyclerViewAdapter<DetailAdapter.ViewHolder> {
 
     private HomePageViewModel homePageViewModel;
+    private List<WeatherDetail> items=new ArrayList<>(0);
 
     public DetailAdapter(HomePageViewModel homePageViewModel) {
         this.homePageViewModel=homePageViewModel;
+    }
+
+    public void replaceData(List<WeatherDetail> items){
+        this.items.clear();
+        this.items.addAll(items);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -37,7 +46,7 @@ public class DetailAdapter extends BaseRecyclerViewAdapter<DetailAdapter.ViewHol
 
     @Override
     public void onBindViewHolder(DetailAdapter.ViewHolder holder, int position) {
-        WeatherDetail detail = homePageViewModel.weatherDetails.getValue().get(position);
+        WeatherDetail detail = items.get(position);
         holder.itemDetailBinding.detailIconImageView.setImageResource(detail.getIconResourceId());
         holder.bindData(detail);
 //        android:src="@{weatherDetail.iconResourceId}"
@@ -46,7 +55,7 @@ public class DetailAdapter extends BaseRecyclerViewAdapter<DetailAdapter.ViewHol
 
     @Override
     public int getItemCount() {
-        return homePageViewModel.weatherDetails.getValue().size();
+        return items.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

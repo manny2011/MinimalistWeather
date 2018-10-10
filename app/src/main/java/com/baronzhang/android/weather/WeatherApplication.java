@@ -17,6 +17,7 @@ import com.baronzhang.android.weather.data.http.configuration.ApiConfiguration;
 public class WeatherApplication extends Application {
 
     private static final String TAG = "WeatherApp";
+    public static final String DEFAULT_CITY_ID = "101010100";
 
 //    private ApplicationComponent applicationComponent;
 

@@ -12,6 +12,9 @@ import com.baronzhang.android.weather.R;
 import com.baronzhang.android.weather.databinding.ItemCityManagerBinding;
 import com.baronzhang.android.weather.new_data.entity.Weather;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 城市管理页面Adapter
  *
@@ -23,10 +26,16 @@ public class CityManagerAdapter extends BaseRecyclerViewAdapter<CityManagerAdapt
 
     private DrawerMenuViewModel viewModel;
     private IOnDeleteCity onDeleteCity;
+    private List<Weather> items=new ArrayList<>(0);
 
     public CityManagerAdapter(DrawerMenuViewModel viewModel, IOnDeleteCity onDeleteCity) {
         this.viewModel = viewModel;
         this.onDeleteCity=onDeleteCity;
+    }
+
+    public void replaceData(List<Weather> items){
+        this.items=items;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -38,13 +47,13 @@ public class CityManagerAdapter extends BaseRecyclerViewAdapter<CityManagerAdapt
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        Weather weather = viewModel.weathers.getValue().get(position);
+        Weather weather = items.get(position);
         holder.bindData(weather);
     }
 
     @Override
     public int getItemCount() {
-        return viewModel.weathers.getValue().size();
+        return items.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -60,11 +69,12 @@ public class CityManagerAdapter extends BaseRecyclerViewAdapter<CityManagerAdapt
 
         public void bindData(Weather weather) {
             binding.setWeather(weather);
-            binding.getRoot().setOnClickListener(v -> onDeleteCity.onSelect(weather.getCityId()));
-            binding.itemDelete.setOnClickListener(v -> onDeleteCity.onDelete(weather.getCityId()));
+            binding.getRoot().setOnClickListener(v -> onDeleteCity.onSelect(weather));
+            binding.itemDelete.setOnClickListener(v -> onDeleteCity.onDelete(weather));
             binding.itemTvCity.setText(weather.getCityName());
-            binding.itemTvTemp.setText("发布于 " + DateConvertUtils.timeStampToDate(weather.getWeatherLive().getTime(), DateConvertUtils.DATA_FORMAT_PATTEN_YYYY_MM_DD_HH_MM));
-            binding.itemTvPublishTime.setText(new StringBuilder().append(weather.getWeatherForecasts().get(0).getTempMin()).append("~").append(weather.getWeatherForecasts().get(0).getTempMax()).append("℃").toString());
+            binding.itemTvPublishTime.setText("发布于 " + DateConvertUtils.timeStampToDate(weather.getWeatherLive().getTime(), DateConvertUtils.DATA_FORMAT_PATTEN_YYYY_MM_DD_HH_MM));
+            binding.itemTvTemp.setText(new StringBuilder().append(weather.getWeatherForecasts().get(0).getTempMin()).append("~").append(weather.getWeatherForecasts().get(0).getTempMax()).append("℃").toString());
+            binding.executePendingBindings();
         }
     }
 

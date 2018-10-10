@@ -12,7 +12,7 @@ import com.baronzhang.android.weather.new_data.entity.AirQualityLive;
 @Dao
 public interface AirQualityLiveDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAirQualityLive(AirQualityLive airQualityLive);
+    void insertOrUpdateAirQualityLive(AirQualityLive airQualityLive);
 
     @Delete
     void deleteAirQualityLive(AirQualityLive airQualityLive);
@@ -22,4 +22,7 @@ public interface AirQualityLiveDao {
 
     @Query(value = "SELECT * FROM airquality WHERE cityId = :cityId")
     AirQualityLive queryAirQualityLiveById(String cityId);
+
+    @Query(value = "DELETE FROM airquality WHERE cityId = :cityId")
+    void deleteAirQualityLiveByCityId(String cityId);
 }

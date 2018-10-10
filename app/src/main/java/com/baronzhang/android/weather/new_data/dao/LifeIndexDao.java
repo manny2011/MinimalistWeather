@@ -14,7 +14,7 @@ import java.util.List;
 @Dao
 public interface LifeIndexDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertOrUpdateLifeIndexes(List<LifeIndex> lifeIndexes);
+    void insertLifeIndexes(List<LifeIndex> lifeIndexes);
 
     @Delete
     void deleteLifeIndex(LifeIndex lifeIndex);
@@ -24,4 +24,7 @@ public interface LifeIndexDao {
 
     @Query(value = "SELECT * FROM lifeindex WHERE cityId = :cityId")
     List<LifeIndex> queryLifeIndexes(String cityId);
+
+    @Query(value = "DELETE  FROM lifeindex WHERE cityId = :cityId")
+    void deleteLifeIndexesByCityId(String cityId);
 }

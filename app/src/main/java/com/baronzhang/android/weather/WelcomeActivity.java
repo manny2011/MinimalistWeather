@@ -52,7 +52,7 @@ public class WelcomeActivity extends BaseActivity {
         //TODO 测试，待删除
         if (PreferenceHelper.getSharedPreferences().getBoolean(WeatherSettings.SETTINGS_FIRST_USE.getId(), false)) {
             try {
-                PreferenceHelper.savePreference(WeatherSettings.SETTINGS_CURRENT_CITY_ID, "101020100");
+                PreferenceHelper.savePreference(WeatherSettings.SETTINGS_CURRENT_CITY_ID, WeatherApplication.DEFAULT_CITY_ID);
                 PreferenceHelper.savePreference(WeatherSettings.SETTINGS_FIRST_USE, false);
             } catch (InvalidClassException e) {
                 e.printStackTrace();

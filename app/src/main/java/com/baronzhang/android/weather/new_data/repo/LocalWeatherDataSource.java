@@ -1,5 +1,7 @@
 package com.baronzhang.android.weather.new_data.repo;
 
+import android.util.Log;
+
 import com.baronzhang.android.weather.new_data.dao.AirQualityLiveDao;
 import com.baronzhang.android.weather.new_data.dao.LifeIndexDao;
 import com.baronzhang.android.weather.new_data.dao.WeatherDao;
@@ -7,7 +9,6 @@ import com.baronzhang.android.weather.new_data.dao.WeatherForecastDao;
 import com.baronzhang.android.weather.new_data.dao.WeatherLiveDao;
 import com.baronzhang.android.weather.new_data.db.AppDatabase;
 import com.baronzhang.android.weather.new_data.entity.Weather;
-import com.j256.ormlite.stmt.query.In;
 
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class LocalWeatherDataSource implements ILocalWeatherDataSource {
 
     @Override
     public List<Weather> queryAllSaveCity() {
+        Log.e("Room","比较操作顺序: 开始查询所有城市");
         List<Weather> weathers = mWeatherDao.queryAllSavedWeathers();
         for (Weather next : weathers) {
             next.setWeatherLive(mWeatherLiveDao.queryWeatherLiveByCityId(next.getCityId()));
@@ -62,21 +64,34 @@ public class LocalWeatherDataSource implements ILocalWeatherDataSource {
             next.setLifeIndexes(mLifeIndexDao.queryLifeIndexes(next.getCityId()));
             next.setAirQualityLive(mAirQualityLiveDao.queryAirQualityLiveById(next.getCityId()));
         }
+        Log.e("Room","比较操作顺序: 结束查询所有城市");
         return weathers;
     }
 
     @Override
     public void insertOrUpdateWeather(Weather weather) {
+        Log.e("Room","比较操作顺序: 开始插入新Weather");
         mWeatherDao.insertOrUpdateWeather(weather);
-        mWeatherForecastDao.insertOrUpdateWeatherForecast(weather.getWeatherForecasts());
+
+        mWeatherForecastDao.deleteWeatherForecastById(weather.getCityId());
+        mWeatherForecastDao.insertWeatherForecast(weather.getWeatherForecasts());
+
         mWeatherLiveDao.insertOrUpdateWeatherLive(weather.getWeatherLive());
-        mAirQualityLiveDao.insertAirQualityLive(weather.getAirQualityLive());
-        mLifeIndexDao.insertOrUpdateLifeIndexes(weather.getLifeIndexes());
+
+        mAirQualityLiveDao.insertOrUpdateAirQualityLive(weather.getAirQualityLive());
+
+        mLifeIndexDao.deleteLifeIndexesByCityId(weather.getCityId());
+        mLifeIndexDao.insertLifeIndexes(weather.getLifeIndexes());
+        Log.e("Room","比较操作顺序: 结束插入新Weather");
     }
 
     @Override
     public void deleteWeatherByCityId(String cityId) {
         mWeatherDao.deleteWeatherById(cityId);
+        mLifeIndexDao.deleteLifeIndexesByCityId(cityId);
+        mWeatherForecastDao.deleteWeatherForecastById(cityId);
+        mAirQualityLiveDao.deleteAirQualityLiveByCityId(cityId);
+        mWeatherLiveDao.deleteWeatherLiveByCityId(cityId);
     }
 
     @Override

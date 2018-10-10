@@ -10,8 +10,13 @@ import com.baronzhang.android.weather.base.BaseRecyclerViewAdapter;
 import com.baronzhang.android.weather.R;
 import com.baronzhang.android.weather.databinding.ItemLifeIndexBinding;
 import com.baronzhang.android.weather.new_data.entity.LifeIndex;
+import com.baronzhang.android.weather.new_data.entity.Weather;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.baronzhang.android.weather.R.drawable.ic_index_sunscreen;
+import static com.baronzhang.android.weather.R.drawable.notification_action_background;
 
 /**
  * @author baronzhang (baron[dot]zhanglei[at]gmail[dot]com)
@@ -21,10 +26,17 @@ public class LifeIndexAdapter extends BaseRecyclerViewAdapter<LifeIndexAdapter.V
 
     private Context context;
     private HomePageViewModel homePageViewModel;
+    private List<LifeIndex> items=new ArrayList<>(0);
 
     public LifeIndexAdapter(Context context, HomePageViewModel homePageViewModel) {
         this.context = context;
         this.homePageViewModel=homePageViewModel;
+    }
+
+    public void replaceData(List<LifeIndex> items){
+        this.items.clear();
+        this.items.addAll(items);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -35,14 +47,14 @@ public class LifeIndexAdapter extends BaseRecyclerViewAdapter<LifeIndexAdapter.V
 
     @Override
     public void onBindViewHolder(LifeIndexAdapter.ViewHolder holder, int position) {
-        LifeIndex lifeIndex = homePageViewModel.lifeIndices.getValue().get(position);
+        LifeIndex lifeIndex=items.get(position);
         holder.bindData(lifeIndex);
         holder.lifeIndexBinding.indexIconImageView.setImageDrawable(getIndexDrawable(context, lifeIndex.getName()));
     }
 
     @Override
     public int getItemCount() {
-        return homePageViewModel.lifeIndices.getValue().size();
+        return items.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -53,6 +65,7 @@ public class LifeIndexAdapter extends BaseRecyclerViewAdapter<LifeIndexAdapter.V
         }
         public void bindData(LifeIndex lifeIndex){
             lifeIndexBinding.setLifeIndex(lifeIndex);
+            lifeIndexBinding.executePendingBindings();
         }
     }
 

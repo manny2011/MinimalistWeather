@@ -6,6 +6,7 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+import com.baronzhang.android.weather.data.WeatherDetail;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -41,6 +42,17 @@ public class Weather {
     private AirQualityLive airQualityLive;
     @Ignore
     private List<LifeIndex> lifeIndexes;
+
+    public List<WeatherDetail> getWeatherDetails() {
+        return weatherDetails;
+    }
+
+    public void setWeatherDetails(List<WeatherDetail> weatherDetails) {
+        this.weatherDetails = weatherDetails;
+    }
+
+    @Ignore
+    private List<WeatherDetail> weatherDetails;
 
     public AirQualityLive getAirQualityLive() {
         return airQualityLive;
