@@ -20,9 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 public class DrawerMenuViewModel extends AndroidViewModel implements RecyclerItemMultiLister {
 
+    private CompositeDisposable disposables=new CompositeDisposable();
     public MutableLiveData<List<Weather>> weathers = new MutableLiveData<>();
     public MutableLiveData<String> currentCity=new MutableLiveData<>();
 
@@ -36,20 +39,21 @@ public class DrawerMenuViewModel extends AndroidViewModel implements RecyclerIte
     @SuppressLint("CheckResult")
     public void loadSavedCities() {
 
-        InjectorUtils.getWeatherDataRepository(getApplication())
+        Disposable disposable = InjectorUtils.getWeatherDataRepository(getApplication())
                 .getSavedCityInfo()
                 .compose(RxSchedulerUtils.normalSchedulersTransformer())
-                .subscribe(e->weathers.setValue(e));
-
+                .subscribe(e -> weathers.setValue(e));
+        disposables.add(disposable);
     }
 
     @SuppressLint("CheckResult")
     public void deleteCity(Weather weather) {
 
-        InjectorUtils.getWeatherDataRepository(getApplication())
+        Disposable disposable = InjectorUtils.getWeatherDataRepository(getApplication())
                 .deleteCity(weather)
                 .compose(RxSchedulerUtils.normalSchedulersTransformer())
                 .subscribe(this::saveCurrentCityToPreference);
+        disposables.add(disposable);
     }
 
 //    private String deleteCityFromDBAndReturnCurrentCityId(String cityId) {
@@ -90,5 +94,9 @@ public class DrawerMenuViewModel extends AndroidViewModel implements RecyclerIte
 
     }
 
-
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        disposables.clear();
+    }
 }

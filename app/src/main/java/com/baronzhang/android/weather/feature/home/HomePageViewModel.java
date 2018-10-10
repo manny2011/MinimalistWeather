@@ -23,11 +23,13 @@ import java.util.List;
 
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class HomePageViewModel extends AndroidViewModel {
 
-//    private CompositeSubscription subscriptions = new CompositeSubscription();
+    private CompositeDisposable subscriptions = new CompositeDisposable();
     public MutableLiveData<Weather> weather = new MutableLiveData<>();
 
     public HomePageViewModel(Application application) {
@@ -49,26 +51,22 @@ public class HomePageViewModel extends AndroidViewModel {
 
     @SuppressLint("CheckResult")
     public void loadWeather(String cityId, boolean refreshNow) {
-        long start=System.currentTimeMillis();
-        InjectorUtils.getWeatherDataRepository(getApplication())
+        Disposable subscription = InjectorUtils.getWeatherDataRepository(getApplication())
                 .getWeather(cityId, refreshNow)
-//                .compose(RxSchedulerUtils.normalSchedulersTransformer())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxSchedulerUtils.normalSchedulersTransformer())
                 .subscribe(it -> {
                     it.setWeatherDetails(createDetails(it));
                     weather.setValue(it);
                 }, throwable -> {
                     Toast.makeText(WeatherApplication.getInstance(), throwable.getMessage(), Toast.LENGTH_LONG).show();
                 });
-        Log.e("interval", "onCreate: load Weather request Interval: "+(System.currentTimeMillis()-start));
 
-//        subscriptions.add(subscription);
+        subscriptions.add(subscription);
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-//        subscriptions.clear();
+        subscriptions.clear();
     }
 }

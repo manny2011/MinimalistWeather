@@ -34,7 +34,7 @@ import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 public class MainActivity extends BaseActivity {
 
     private HomePageViewModel homePageViewModel;
-    ActivityMainBinding mainBinding;
+    private ActivityMainBinding mainBinding;
     private DrawerMenuViewModel drawerMenuViewModel;
 
     @Override
@@ -50,7 +50,7 @@ public class MainActivity extends BaseActivity {
             window.setStatusBarColor(Color.TRANSPARENT);
         }
 
-        ActivityMainBinding mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         setSupportActionBar(mainBinding.appBar.toolbar);
         //设置 Header 为 Material风格
         ClassicsHeader header = new ClassicsHeader(this);
@@ -58,10 +58,8 @@ public class MainActivity extends BaseActivity {
         mainBinding.appBar.refreshLayout.setRefreshHeader(header);
 
         mainBinding.appBar.refreshLayout.setOnRefreshListener(refreshlayout -> {
-            long start=System.currentTimeMillis();
             String currentCityId = PreferenceHelper.getSharedPreferences().getString(WeatherSettings.SETTINGS_CURRENT_CITY_ID.getId(), "");
             homePageViewModel.loadWeather(currentCityId,true);
-            Log.e("interval", "onCreate: refresh Time Interval: "+(System.currentTimeMillis()-start));
         });
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mainBinding.drawerLayout, mainBinding.appBar.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -98,9 +96,7 @@ public class MainActivity extends BaseActivity {
         }
         drawerMenuViewModel.currentCity.observe(this,it->{
             mainBinding.drawerLayout.closeDrawer(GravityCompat.START);
-            long start=System.currentTimeMillis();
-            new Handler().postDelayed(()->homePageViewModel.loadWeather(it,false),260);
-            Log.e("interval", "onCreate: switchCity Time Interval: "+(System.currentTimeMillis()-start));
+            new Handler().postDelayed(()->homePageViewModel.loadWeather(it,false),270);
         });
         drawerMenuFragment.setViewModel(drawerMenuViewModel);
     }

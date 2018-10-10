@@ -116,7 +116,6 @@ public class DrawerMenuFragment extends BaseFragment implements IOnDeleteCity {
     @Override
     public void onResume() {
         super.onResume();
-//        viewModel.loadSavedCities();
     }
 
     @Override
@@ -135,10 +134,8 @@ public class DrawerMenuFragment extends BaseFragment implements IOnDeleteCity {
         try {
             String cityId=weather.getCityId();
             if(!TextUtils.equals(cityId,viewModel.currentCity.getValue())){
-                long start=System.currentTimeMillis();
                 viewModel.saveCurrentCityToPreference(cityId);//event to viewModel
                 viewModel.currentCity.setValue(cityId);
-                Log.e("interval", "onSelect: 更改当前城市ID: "+(System.currentTimeMillis()-start));
             }
         } catch (InvalidClassException e) {
             e.printStackTrace();

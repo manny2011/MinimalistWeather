@@ -90,7 +90,6 @@ public class HomePageFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         homePageViewModel.weather.observe(this, it -> {
-            long start=System.currentTimeMillis();
             AirQualityLive airQualityLive = it.getAirQualityLive();
             binding.indicatorViewAqi.setIndicatorValue(airQualityLive.getAqi());
             binding.tvAdvice.setText(airQualityLive.getAdvice());
@@ -103,8 +102,6 @@ public class HomePageFragment extends BaseFragment {
             forecastAdapter.replaceData(it.getWeatherForecasts());
             lifeIndexAdapter.replaceData(it.getLifeIndexes());
 
-            System.err.println("更新UI线程: " + Thread.currentThread().getName());
-            Log.e("interval","更新HomeFragView interval: "+(System.currentTimeMillis()-start));
         });
     }
 

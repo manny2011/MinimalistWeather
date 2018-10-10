@@ -28,8 +28,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class SelectCityViewModel extends AndroidViewModel implements RecyclerItemMultiLister {
 
-    static final String TAG="SelectCityVM";
-
+    private static final String TAG="SelectCityVM";
     public MutableLiveData<List<City>> items=new MutableLiveData<>();
 
     public SelectCityViewModel(@NonNull Application application) {
