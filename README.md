@@ -1,3 +1,13 @@
+# MVVM Architecture Diagram For MinimalistWeather:
+*
+
+
+
+
+
+
+
+
 # MinimalistWeather
 
 > 欢迎关注微信公众号：**BaronTalk**
