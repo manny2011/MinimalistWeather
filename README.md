@@ -1,7 +1,6 @@
 # MVVM Architecture Diagram For MinimalistWeather:
-*
 
-
+(https://github.com/manny2011/MinimalistWeather/blob/master/MVVM_Diagram.png)
 
 
 
